@@ -1,32 +1,32 @@
 import $ from 'jquery'
 
 let count = 0
-if (typeof chrome !== 'undefined') {
+if (typeof chrome !== 'undefined') { // eslint-disable-line no-undef
   const easylist = 'https://easylist.to/easylist/easylist.txt'
 
-  $.get(easylist).done((data) => {
+  $.get(easylist).done(data => {
+    const img = chrome.extension.getURL('images/placeholder.jpg') // eslint-disable-line no-undef
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines
-      .filter((line) => {
-        return /^##/.test(line)
+      .filter(line => {
+        return line.startsWith('##')
       })
-      .map((line) => {
+      .map(line => {
         return line.replace(/^##/, '')
       })
       .join(',')
 
-    adReplacer(easylistSelectors)
-    $(document).ready(function () {
-      adReplacer(easylistSelectors)
+    adReplacer(easylistSelectors, img)
+    $(document).ready(() => {
+      adReplacer(easylistSelectors, img)
     })
-    $(window).scroll(function () {
-      adReplacer(easylistSelectors)
+    $(window).scroll(() => {
+      adReplacer(easylistSelectors, img)
     })
   })
 }
 
-function adReplacer (selectors) {
-  const img = chrome.extension.getURL('images/placeholder.jpg')  // eslint-disable-line
+function adReplacer (selectors, img) { // eslint-disable-line space-before-function-paren
   $(selectors).each(function () {
     const height = $(this).height()
     const width = $(this).width()
