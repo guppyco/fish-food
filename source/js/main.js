@@ -6,6 +6,7 @@ if (typeof chrome !== 'undefined') { // eslint-disable-line no-undef
 
   $.get(easylist).done(data => {
     const img = chrome.extension.getURL('images/placeholder.jpg') // eslint-disable-line no-undef
+    let didScroll = false
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines
       .filter(line => {
@@ -21,8 +22,14 @@ if (typeof chrome !== 'undefined') { // eslint-disable-line no-undef
       adReplacer(easylistSelectors, img)
     })
     $(window).scroll(() => {
-      adReplacer(easylistSelectors, img)
+      didScroll = true
     })
+    setInterval(() => {
+      if (didScroll) {
+        adReplacer(easylistSelectors, img)
+        didScroll = false
+      }
+    }, 10000)
   })
 }
 
