@@ -13,24 +13,27 @@
         "name": "Guppy"
     },
     "web_accessible_resources": [
-        "images/*"
+        "images/*",
+        "js/*",
+        "html/*"
     ],
     "permissions": [
         "storage",
         "tabs",
         "https://*/*",
-        "https://easylist-downloads.adblockplus.org/"
+        "https://easylist.to/",
+        "http://localhost:8000/"
     ],
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*"],
-            "js": ["js/main.js"],
+            "js": ["js/background.js"],
             "run_at": "document_start",
             "all_frames": true
         }
     ],
     "background": {
         "persistent": false,
-        "scripts": ["js/main.js"]
+        "scripts": ["js/background.js"]
     }
 }
