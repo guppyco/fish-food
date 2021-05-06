@@ -6,7 +6,7 @@ button.addEventListener('click', () => {
     {
       message: 'logout'
     },
-    function (response) {
+    response => {
       if (response === 'success') {
         window.location.replace('../html/popup_sign_in.html')
       }

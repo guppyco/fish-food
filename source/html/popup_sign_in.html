@@ -23,7 +23,6 @@
         flex-direction: column;
         text-align: center;
         box-sizing: border-box;
-        background-color: #fcee54;
         flex-wrap: wrap;
     }
 
@@ -33,13 +32,12 @@
         width: 75%;
         height: 5%;
         padding: 10px;
-        border: none;
+        border: solid 1 px black;
         font-family: monospace;
     }
 
     button {
         font-size: 200%;
-        background-color: #f5c2e0;
         border-radius: 5px;
         border: none;
         text-align: center;
@@ -49,6 +47,10 @@
         padding: 10px;
         margin-top: 1%;
     }
+    .error-message {
+      color: red;
+      padding: 5px 0;
+    }
   </style>
 </head>
 
@@ -56,9 +58,10 @@
   <form>
     <input type="email" name="email" id="email" placeholder="Email">
     <input type="password" name="password" id="password" placeholder="Password">
+    <span class="error-message"></span>
     <button type="submit">Sign In</button>
   </form>
-  <script src="../js/popup_sign_in.js"></script>
+  <script src="../js/popup-sign-in.js"></script>
 </body>
 
 </html>

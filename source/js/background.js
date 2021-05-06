@@ -2,11 +2,11 @@
 import $ from 'jquery'
 
 let count = 0
-if (typeof chrome !== 'undefined') { // eslint-disable-line no-undef
+if (typeof chrome !== 'undefined') {
   const easylist = 'https://easylist.to/easylist/easylist.txt'
 
   $.get(easylist).done(data => {
-    const img = chrome.extension.getURL('images/placeholder.jpg') // eslint-disable-line no-undef
+    const img = chrome.extension.getURL('images/placeholder.jpg')
     let didScroll = false
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines
@@ -52,41 +52,45 @@ function adReplacer (selectors, img) { // eslint-disable-line space-before-funct
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'login') {
     flipUserStatus(true, request.payload)
-      .then(res => sendResponse(res))
-      .catch(err => console.log(err))
+      .then(response => sendResponse(response))
+      .catch(error => console.log(error))
 
     return true
-  } else if (request.message === 'logout') {
+  }
+
+  if (request.message === 'logout') {
     flipUserStatus(false, null)
-      .then(res => sendResponse(res))
-      .catch(err => console.log(err))
+      .then(response => sendResponse(response))
+      .catch(error => console.log(error))
 
     return true
-  } else if (request.message === 'userStatus') {
+  }
+
+  if (request.message === 'userStatus') {
     isUserSignedIn()
-      .then(res => {
+      .then(response => {
         sendResponse({
           message: 'success',
-          userInfo: res.userInfo.email
+          userInfo: response.userInfo.email
         })
       })
-      .catch(err => console.log(err))
+      .catch(error => console.log(error))
     return true
   }
 })
 
-chrome.browserAction.onClicked.addListener(function () {
+chrome.browserAction.onClicked.addListener(() => {
   let returnSession = true
   isUserSignedIn()
-    .then(res => {
-      if (res.userStatus) {
+    .then(response => {
+      if (response.userStatus) {
         if (returnSession) {
           chrome.windows.create({
             url: './html/popup_account.html',
             width: 300,
             height: 600,
             focused: true
-          }, function () {
+          }, () => {
             returnSession = false
           })
         } else {
@@ -106,75 +110,99 @@ chrome.browserAction.onClicked.addListener(function () {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(error => console.log(error))
 })
 
 chrome.runtime.sendMessage({
   message: 'userStatus',
-  function (response) {
+  function(response) {
     if (response.message === 'success') {
-      document.getElementById('name').innerText =
-      response.userInfo
+      $('#name').text(response.userInfo)
     }
   }
 })
 
-function flipUserStatus (signIn, userInfo) {
+function flipUserStatus(signIn, userInfo) {
   if (signIn) {
-    $.post('http://localhost:8000/login/', {
+    return $.post('http://localhost:8000/login/', {
       'login-username': userInfo.email,
       'login-password': userInfo.pass
-    }).done(function (res) {
+    }).done(response => {
       return new Promise(resolve => {
-        if (res.status !== 200) resolve('fail')
+        if (response.status !== 200) {
+          resolve('fail')
+        }
 
-        chrome.storage.local.set({ userStatus: signIn, userInfo }, function (response) {
-          if (chrome.runtime.lastError) resolve('fail')
+        if (response.status === 200) {
+          chrome.storage.local.set({
+            userStatus: signIn, userInfo
+          }, () => {
+            if (chrome.runtime.lastError) {
+              resolve('fail')
+            } else {
+              resolve('success')
+            }
+          })
+        }
+      })
+    }).fail(error => {
+      console.log(error)
+    })
+  }
+
+  // Fetch the localhost:8000/logout/ route
+  return new Promise(resolve => {
+    chrome.storage.local.get(['userStatus', 'userInfo'], response => {
+      if (chrome.runtime.lastError) {
+        resolve('fail')
+      }
+
+      if (response.userStatus === undefined) {
+        resolve('fail')
+      }
+
+      $.post('http://localhost:8000/logout/', {
+        'login-username': userInfo.email
+      }).done(response => {
+        if (response.status !== 200) {
+          resolve('fail')
+        }
+
+        chrome.storage.local.set({
+          userStatus: signIn, userInfo: {}
+        }, () => {
+          if (chrome.runtime.lastError) {
+            resolve('fail')
+          }
 
           resolve('success')
         })
-      })
-    }).fail(function (err) {
-      console.log(err)
-    })
-  } else if (!signIn) {
-    // fetch the localhost:8000/logout/ route
-    return new Promise(resolve => {
-      chrome.storage.local.get(['userStatus', 'userInfo'], function (response) {
-        if (chrome.runtime.lastError) resolve('fail')
-
-        if (response.userStatus === undefined) resolve('fail')
-
-        $.post('http://localhost:8000/logout/', {
-          'login-username': userInfo.email
-        }).done(function (res) {
-          if (res.status !== 200) resolve('fail')
-
-          chrome.storage.local.set({ userStatus: signIn, userInfo: {} }, function (response) {
-            if (chrome.runtime.lastError) resolve('fail')
-
-            resolve('success')
-          })
-        }).fail(function (err) {
-          console.log(err)
-        })
+      }).fail(error => {
+        console.log(error)
       })
     })
-  }
+  })
 }
 
-function isUserSignedIn () {
+function isUserSignedIn() {
   return new Promise(resolve => {
-    chrome.storage.local.get(['userStatus', 'userInfo'], function (response) {
+    chrome.storage.local.get(['userStatus', 'userInfo'], response => {
       if (chrome.runtime.lastError) {
         resolve(
-          { userStatus: false, userInfo: {} }
+          {
+            userStatus: false, userInfo: {}
+          }
         )
       }
+
       resolve(
-        response.userStatus === undefined
-          ? { userStatus: false, userInfo: {} }
-          : { userStatus: response.userStatus, userInfo: response.userInfo }
+        response.userStatus === undefined ?
+          {
+            userStatus: false, userInfo: {}
+          } :
+          {
+            userStatus: response.userStatus, userInfo: response.userInfo
+          }
       )
     })
   })
