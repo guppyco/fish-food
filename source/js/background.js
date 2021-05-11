@@ -52,8 +52,15 @@ function adReplacer (selectors, img) { // eslint-disable-line space-before-funct
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'login') {
     flipUserStatus(true, request.payload)
-      .then(response => sendResponse(response))
-      .catch(error => console.log(error))
+      .then(response => {
+        sendResponse(response)
+      })
+      .catch(error => {
+        sendResponse({
+          message: 'error',
+          err: error
+        })
+      })
 
     return true
   }
@@ -61,7 +68,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'logout') {
     flipUserStatus(false, null)
       .then(response => sendResponse(response))
-      .catch(error => console.log(error))
+      .catch(error => {
+        sendResponse({
+          message: 'error',
+          err: error
+        })
+      })
 
     return true
   }
@@ -69,73 +81,39 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'userStatus') {
     isUserSignedIn()
       .then(response => {
-        sendResponse({
-          message: 'success',
-          userInfo: response.userInfo.email
-        })
-      })
-      .catch(error => console.log(error))
-    return true
-  }
-})
-
-chrome.browserAction.onClicked.addListener(() => {
-  let returnSession = true
-  isUserSignedIn()
-    .then(response => {
-      if (response.userStatus) {
-        if (returnSession) {
-          chrome.windows.create({
-            url: './html/popup_account.html',
-            width: 300,
-            height: 600,
-            focused: true
-          }, () => {
-            returnSession = false
+        if (response.userStatus) {
+          sendResponse({
+            message: 'success',
+            userInfo: response.userInfo
           })
         } else {
-          chrome.windows.create({
-            url: './html/popup_sign_out.html',
-            width: 300,
-            height: 600,
-            focused: true
+          sendResponse({
+            message: 'fail'
           })
         }
-      } else {
-        chrome.windows.create({
-          url: './html/popup_sign_in.html',
-          width: 300,
-          height: 600,
-          focused: true
+      })
+      .catch(error => {
+        sendResponse({
+          message: 'error',
+          err: error
         })
-      }
-    })
-    .catch(error => console.log(error))
-})
-
-chrome.runtime.sendMessage({
-  message: 'userStatus',
-  function(response) {
-    if (response.message === 'success') {
-      $('#name').text(response.userInfo)
-    }
+      })
+    return true
   }
 })
 
 function flipUserStatus(signIn, userInfo) {
   if (signIn) {
-    return $.post('http://localhost:8000/login/', {
-      'login-username': userInfo.email,
-      'login-password': userInfo.pass
-    }).done(response => {
-      return new Promise(resolve => {
-        if (response.status !== 200) {
-          resolve('fail')
-        }
-
-        if (response.status === 200) {
+    return new Promise(resolve => {
+      $.post('http://localhost:8000/api/token/', {
+        email: userInfo.email,
+        password: userInfo.pass
+      }).done(response => {
+        if (response.access) {
           chrome.storage.local.set({
-            userStatus: signIn, userInfo
+            userStatus: signIn,
+            token: response,
+            userInfo: userInfo.email
           }, () => {
             if (chrome.runtime.lastError) {
               resolve('fail')
@@ -143,16 +121,19 @@ function flipUserStatus(signIn, userInfo) {
               resolve('success')
             }
           })
+        } else {
+          resolve('fail')
         }
+      }).fail(error => {
+        resolve('fail')
+        console.log(error)
       })
-    }).fail(error => {
-      console.log(error)
     })
   }
 
   // Fetch the localhost:8000/logout/ route
   return new Promise(resolve => {
-    chrome.storage.local.get(['userStatus', 'userInfo'], response => {
+    chrome.storage.local.get(['userStatus', 'token', 'userInfo'], response => {
       if (chrome.runtime.lastError) {
         resolve('fail')
       }
@@ -161,15 +142,15 @@ function flipUserStatus(signIn, userInfo) {
         resolve('fail')
       }
 
-      $.post('http://localhost:8000/logout/', {
-        'login-username': userInfo.email
+      $.post('http://localhost:8000/api/logout/', {
+        token: response.token.access
       }).done(response => {
         if (response.status !== 200) {
           resolve('fail')
         }
 
         chrome.storage.local.set({
-          userStatus: signIn, userInfo: {}
+          userStatus: false, userInfo: {}
         }, () => {
           if (chrome.runtime.lastError) {
             resolve('fail')
@@ -178,6 +159,7 @@ function flipUserStatus(signIn, userInfo) {
           resolve('success')
         })
       }).fail(error => {
+        resolve('fail')
         console.log(error)
       })
     })

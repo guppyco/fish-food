@@ -2,66 +2,21 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    body {
-        width: 100vw;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    form {
-        align-items: center;
-        display: flex;
-        width: 100%;
-        height: 100%;
-        justify-content: center;
-        flex-direction: column;
-        text-align: center;
-        box-sizing: border-box;
-        flex-wrap: wrap;
-    }
-
-    input {
-        margin: 10px;
-        font-size: 120%;
-        width: 75%;
-        height: 5%;
-        padding: 10px;
-        border: solid 1 px black;
-        font-family: monospace;
-    }
-
-    button {
-        font-size: 200%;
-        border-radius: 5px;
-        border: none;
-        text-align: center;
-        color: black;
-        font-family: monospace;
-        font-weight: bold;
-        padding: 10px;
-        margin-top: 1%;
-    }
-    .error-message {
-      color: red;
-      padding: 5px 0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guppy</title>
+    <link rel="stylesheet" href="../css/common.css" type="text/css" />
 </head>
 
 <body>
-  <form>
-    <input type="email" name="email" id="email" placeholder="Email">
-    <input type="password" name="password" id="password" placeholder="Password">
-    <span class="error-message"></span>
-    <button type="submit">Sign In</button>
-  </form>
-  <script src="../js/popup-sign-in.js"></script>
+    <form>
+        <input type="email" name="email" id="email" placeholder="Email">
+        <input type="password" name="password" id="password" placeholder="Password">
+        <span class="error-message"></span>
+        <button type="submit">Sign In</button>
+    </form>
 </body>
+
+<script src="../js/popup-sign-in.js"></script>
 
 </html>

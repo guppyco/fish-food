@@ -21,7 +21,7 @@ document.querySelector('form').addEventListener('submit', event => {
       },
       response => {
         if (response === 'success') {
-          window.location.replace('../html/popup_sign_out.html')
+          window.location.replace('../html/popup_account.html')
         } else {
           $('.error-message').text('This account is not valid')
         }

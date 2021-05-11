@@ -1,4 +1,6 @@
 /* global chrome */
+import $ from 'jquery'
+
 const button = document.querySelector('button')
 
 button.addEventListener('click', () => {
@@ -9,6 +11,19 @@ button.addEventListener('click', () => {
     response => {
       if (response === 'success') {
         window.location.replace('../html/popup_sign_in.html')
+      }
+    }
+  )
+})
+
+window.addEventListener('load', () => {
+  chrome.runtime.sendMessage(
+    {
+      message: 'userStatus'
+    },
+    response => {
+      if (response.message === 'success') {
+        $('#name').text(response.userInfo)
       }
     }
   )

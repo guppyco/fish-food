@@ -10,6 +10,7 @@
     },
     "browser_action": {
         "default_icon": "images/icon.png",
+        "default_popup" : "html/popup.html",
         "name": "Guppy"
     },
     "web_accessible_resources": [
