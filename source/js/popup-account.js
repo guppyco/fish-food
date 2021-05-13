@@ -9,7 +9,7 @@ button.addEventListener('click', () => {
       message: 'logout'
     },
     response => {
-      if (response === 'success') {
+      if (response.message === 'success') {
         window.location.replace('../html/popup_sign_in.html')
       }
     }
@@ -19,11 +19,13 @@ button.addEventListener('click', () => {
 window.addEventListener('load', () => {
   chrome.runtime.sendMessage(
     {
-      message: 'userStatus'
+      message: 'userAccount'
     },
     response => {
       if (response.message === 'success') {
-        $('#name').text(response.userInfo)
+        $('#name').text(response.data.user)
+      } else {
+        window.location.replace('../html/popup_sign_in.html')
       }
     }
   )

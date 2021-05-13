@@ -67,7 +67,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.message === 'logout') {
     flipUserStatus(false, null)
-      .then(response => sendResponse(response))
+      .then(response => {
+        sendResponse({
+          message: 'success',
+          data: response
+        })
+      })
       .catch(error => {
         sendResponse({
           message: 'error',
@@ -100,16 +105,44 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       })
     return true
   }
+
+  if (request.message === 'userAccount') {
+    getAccountInfo()
+      .then(account => {
+        if (account) {
+          sendResponse({
+            message: 'success',
+            data: account
+          })
+        } else {
+          sendResponse({
+            message: 'fail'
+          })
+        }
+      })
+      .catch(() => {
+        sendResponse({
+          message: 'error'
+        })
+      })
+
+    return true
+  }
 })
 
 function flipUserStatus(signIn, userInfo) {
   if (signIn) {
     return new Promise(resolve => {
-      $.post('http://localhost:8000/api/token/', {
-        email: userInfo.email,
-        password: userInfo.pass
+      $.ajax({
+        url: 'http://localhost:8000/api/token-auth/',
+        type: 'post',
+        data: {
+          email: userInfo.email,
+          password: userInfo.pass
+        },
+        dataType: 'json'
       }).done(response => {
-        if (response.access) {
+        if (response.token) {
           chrome.storage.local.set({
             userStatus: signIn,
             token: response,
@@ -142,10 +175,15 @@ function flipUserStatus(signIn, userInfo) {
         resolve('fail')
       }
 
-      $.post('http://localhost:8000/api/logout/', {
-        token: response.token.access
+      $.ajax({
+        url: 'http://localhost:8000/api/token-destroy/',
+        type: 'post',
+        headers: {
+          Authorization: 'Bearer ' + response.token.token
+        },
+        dataType: 'json'
       }).done(response => {
-        if (response.status !== 200) {
+        if (!response) {
           resolve('fail')
         }
 
@@ -159,7 +197,15 @@ function flipUserStatus(signIn, userInfo) {
           resolve('success')
         })
       }).fail(error => {
-        resolve('fail')
+        chrome.storage.local.set({
+          userStatus: false, userInfo: {}
+        }, () => {
+          if (chrome.runtime.lastError) {
+            resolve('fail')
+          }
+
+          resolve('success')
+        })
         console.log(error)
       })
     })
@@ -168,7 +214,7 @@ function flipUserStatus(signIn, userInfo) {
 
 function isUserSignedIn() {
   return new Promise(resolve => {
-    chrome.storage.local.get(['userStatus', 'userInfo'], response => {
+    chrome.storage.local.get(['userStatus', 'token', 'userInfo'], response => {
       if (chrome.runtime.lastError) {
         resolve(
           {
@@ -183,9 +229,39 @@ function isUserSignedIn() {
             userStatus: false, userInfo: {}
           } :
           {
-            userStatus: response.userStatus, userInfo: response.userInfo
+            userStatus: response.userStatus,
+            token: response.token.token,
+            userInfo: response.userInfo
           }
       )
+    })
+  })
+}
+
+function getAccountInfo() {
+  return new Promise(resolve => {
+    isUserSignedIn().then(response => {
+      if (response.userStatus) {
+        $.ajax({
+          url: 'http://localhost:8000/api/account/',
+          type: 'get',
+          headers: {
+            Authorization: 'Bearer ' + response.token
+          },
+          dataType: 'json',
+          success: data => {
+            resolve(data)
+          }
+        }).fail(() => {
+          // Logout
+          flipUserStatus(false, null)
+          resolve(false)
+        })
+      } else {
+        resolve(false)
+      }
+    }).catch(() => {
+      resolve(false)
     })
   })
 }
