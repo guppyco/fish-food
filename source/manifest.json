@@ -23,7 +23,8 @@
         "tabs",
         "https://*/*",
         "https://easylist.to/",
-        "http://localhost:8000/"
+        "http://localhost:8000/",
+        "https://localhost:8000/"
     ],
     "content_scripts": [
         {
