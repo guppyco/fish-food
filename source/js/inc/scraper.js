@@ -11,16 +11,16 @@ export function googleSearch() {
     // TODO: get more results
     $('#search .g a').each(function () {
       const href = $(this).attr('href')
-      if (href.startsWith('http')) {
+      if (href && href.startsWith('http')) {
         items.push(href)
       }
     })
     const terms = $('input[name="q"]').val()
 
-    let headerVars = {}
+    let headers = {}
     isUserSignedIn().then(response => {
       if (response.userStatus) {
-        headerVars = {
+        headers = {
           Authorization: 'Bearer ' + response.token
         }
       }
@@ -29,7 +29,7 @@ export function googleSearch() {
         url: 'http://localhost:8000/api/search/',
         type: 'post',
         traditional: true, // Remove brackets
-        headers: headerVars,
+        headers,
         data: {
           search_type: 0, // eslint-disable-line camelcase
           search_terms: terms, // eslint-disable-line camelcase

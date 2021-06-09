@@ -126,4 +126,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true
   }
+
+  // Get all tabs
+  if (request.message === 'allTabs') {
+    const queryOptions = {}
+    chrome.tabs.query(queryOptions, tabs => {
+      // Fix Tabs cannot be edited right now (user may be dragging a tab).
+      // https://www.reddit.com/r/chrome_extensions/comments/no7igm/
+      setTimeout(() => {
+        sendResponse({tabs})
+      }, 500)
+    })
+
+    return true
+  }
 })
