@@ -1,6 +1,6 @@
 import $ from 'jquery'
 
-export function adReplacer (selectors, img, count) { // eslint-disable-line space-before-function-paren
+export function adReplacer(selectors, img, count) {
   $(selectors).each(function () {
     const height = $(this).height()
     const width = $(this).width()

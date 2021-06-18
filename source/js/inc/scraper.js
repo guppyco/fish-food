@@ -1,5 +1,6 @@
 import $ from 'jquery'
 
+import {env} from '../env.js'
 import {isUserSignedIn} from './account.js'
 
 export function googleSearch() {
@@ -25,8 +26,9 @@ export function googleSearch() {
         }
       }
 
+      const url = env.guppyApiUrl + '/api/search/'
       $.ajax({
-        url: 'http://localhost:8000/api/search/',
+        url,
         type: 'post',
         traditional: true, // Remove brackets
         headers,
