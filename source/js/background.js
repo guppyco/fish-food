@@ -1,51 +1,10 @@
 /* global chrome */
 
-import $ from 'jquery'
-
 import {
   isUserSignedIn,
   getAccountInfo,
   flipUserStatus
 } from './inc/account.js'
-import {adReplacer} from './inc/ad-replacer.js'
-import {googleSearch} from './inc/scraper.js'
-
-let count = 0
-if (typeof chrome !== 'undefined') {
-  // Ads replacer
-  const easylist = 'https://easylist.to/easylist/easylist.txt'
-
-  $.get(easylist).done(data => {
-    const img = chrome.extension.getURL('images/placeholder.jpg')
-    let didScroll = false
-    const easylistLines = data.split('\n')
-    const easylistSelectors = easylistLines
-      .filter(line => {
-        return line.startsWith('##')
-      })
-      .map(line => {
-        return line.replace(/^##/, '')
-      })
-      .join(',')
-
-    count = adReplacer(easylistSelectors, img, count)
-    $(document).ready(() => {
-      count = adReplacer(easylistSelectors, img, count)
-
-      // Crawl Google search results
-      googleSearch()
-    })
-    $(window).scroll(() => {
-      didScroll = true
-    })
-    setInterval(() => {
-      if (didScroll) {
-        count = adReplacer(easylistSelectors, img, count)
-        didScroll = false
-      }
-    }, 10000)
-  })
-}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'login') {

@@ -2,11 +2,13 @@
 
 import $ from 'jquery'
 
+import {env} from '../env.js'
+
 export function flipUserStatus(signIn, userInfo) {
   if (signIn) {
     return new Promise(resolve => {
       $.ajax({
-        url: 'http://localhost:8000/api/token-auth/',
+        url: env.guppyApiUrl + '/api/token-auth/',
         type: 'post',
         data: {
           email: userInfo.email,
@@ -36,7 +38,7 @@ export function flipUserStatus(signIn, userInfo) {
     })
   }
 
-  // Fetch the localhost:8000/logout/ route
+  // Fetch the /logout/ route
   return new Promise(resolve => {
     chrome.storage.local.get(['userStatus', 'token', 'userInfo'], response => {
       if (chrome.runtime.lastError) {
@@ -48,7 +50,7 @@ export function flipUserStatus(signIn, userInfo) {
       }
 
       $.ajax({
-        url: 'http://localhost:8000/api/token-destroy/',
+        url: env.guppyApiUrl + '/api/token-destroy/',
         type: 'post',
         headers: {
           Authorization: 'Bearer ' + response.token.token
@@ -115,7 +117,7 @@ export function getAccountInfo() {
     isUserSignedIn().then(response => {
       if (response.userStatus) {
         $.ajax({
-          url: 'http://localhost:8000/api/account/',
+          url: env.guppyApiUrl + '/api/account/',
           type: 'get',
           headers: {
             Authorization: 'Bearer ' + response.token
