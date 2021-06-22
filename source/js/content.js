@@ -75,9 +75,8 @@ async function sendPageView(url, title, referrer) {
       }
     }
 
-    const url = env.guppyApiUrl + '/api/histories/'
     $.ajax({
-      url,
+      url: env.guppyApiUrl + '/api/histories/',
       type: 'post',
       headers,
       data: {

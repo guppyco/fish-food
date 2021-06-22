@@ -6,7 +6,7 @@ import {isUserSignedIn} from './account.js'
 export function googleSearch() {
   // Crawl Google search results
   const origin = window.location.origin
-  const isGoogleSearch = origin.includes('www.google.') || origin.includes('://google.')
+  const isGoogleSearch = origin.includes('://www.google.') || origin.includes('://google.')
   if (isGoogleSearch) {
     const items = []
     // TODO: get more results
@@ -26,9 +26,8 @@ export function googleSearch() {
         }
       }
 
-      const url = env.guppyApiUrl + '/api/search/'
       $.ajax({
-        url,
+        url: env.guppyApiUrl + '/api/search/',
         type: 'post',
         traditional: true, // Remove brackets
         headers,
