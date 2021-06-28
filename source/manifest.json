@@ -21,6 +21,7 @@
     "permissions": [
         "storage",
         "tabs",
+        "notifications",
         "https://*/*",
         "https://easylist.to/",
         "http://localhost:8000/",

@@ -7,6 +7,7 @@ import {adReplacer} from './inc/ad-replacer.js'
 import {googleSearch} from './inc/scraper.js'
 
 import {isUserSignedIn} from './inc/account.js'
+import {getToday} from './inc/helpers.js'
 
 let count = 0
 if (typeof chrome !== 'undefined') {
@@ -61,6 +62,22 @@ chrome.runtime.sendMessage(
         }
 
         return true
+      })
+    }
+  }
+)
+
+// Check if user is logged in, ask if not
+chrome.runtime.sendMessage(
+  {
+    message: 'askToLogin'
+  },
+  response => {
+    if (!response || !response.message || response.message !== 'success') {
+      // Save is asked flag
+      const today = getToday()
+      chrome.storage.local.set({
+        isAskedLogin: today
       })
     }
   }
