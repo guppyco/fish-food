@@ -126,6 +126,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     return true
   }
+
+  // Open form to login to the extension
+  if (request.message === 'openLoginForm') {
+    chrome.tabs.create({url: './html/popup_sign_in.html'})
+  }
 })
 
 chrome.notifications.onClicked.addListener(notifId => {
@@ -135,6 +140,8 @@ chrome.notifications.onClicked.addListener(notifId => {
 })
 
 chrome.runtime.onStartup.addListener(() => {
-  // Ask user to login when starting browser
-  askToLoginNotification()
+  // Remove flag then ask user to login when starting browser
+  chrome.storage.local.set({
+    isAskedLogin: null
+  })
 })

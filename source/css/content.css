@@ -1,0 +1,35 @@
+.guppy-ask-to-login-banner {
+    position: fixed;
+    z-index: 999999;
+    top: 0;
+    width: 100%;
+    min-height: 50px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+}
+.guppy-ask-to-login-banner .main {
+    position: relative;
+    padding: 10px;
+    min-height: 50px;
+}
+.guppy-ask-to-login-banner .text {
+    margin-right: 40px;
+}
+.guppy-ask-to-login-banner .text .message {
+    font-size: 15px;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+.guppy-ask-to-login-banner .main .remove {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    font-size: 30px;
+    padding: 5px 15px;
+    border-left: solid 2px rgba(255, 255, 255, 0.8);
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -31,7 +31,8 @@
         {
             "matches": ["http://*/*", "https://*/*"],
             "js": ["js/content.js"],
-            "run_at": "document_start",
+            "css": ["css/content.css"],
+            "run_at": "document_end",
             "all_frames": true
         }
     ],
