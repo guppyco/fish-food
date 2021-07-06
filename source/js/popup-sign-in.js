@@ -1,6 +1,8 @@
 /* global chrome */
 import $ from 'jquery'
 
+import {env} from './env.js'
+
 document.querySelector('form').addEventListener('submit', event => {
   event.preventDefault()
   $('#email, #password').css('border-color', 'black')
@@ -32,4 +34,9 @@ document.querySelector('form').addEventListener('submit', event => {
     $('#password').attr('placeholder', 'Enter a password.')
     $('#email, #password').css('border-color', 'red')
   }
+})
+
+// Go to signup page when click create account link
+document.querySelector('#signup-link').addEventListener('click', () => {
+  chrome.tabs.create({url: env.guppyApiUrl + '/signup/'})
 })

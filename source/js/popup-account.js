@@ -23,7 +23,16 @@ window.addEventListener('load', () => {
     },
     response => {
       if (response.message === 'success') {
-        $('#name').text(response.data.user)
+        let status = 'Inactive'
+        if (response.data.profile.status) {
+          status = 'Active'
+        }
+
+        $('#name').text(response.data.profile.full_name)
+        $('#email').text(response.data.user)
+        $('#address').text(response.data.profile.address)
+        $('#time').text(response.data.profile.last_time)
+        $('#status').text(status)
       } else {
         window.location.replace('../html/popup_sign_in.html')
       }
