@@ -1,5 +1,3 @@
-/* global chrome */
-
 import $ from 'jquery'
 
 import {env} from './env.js'
@@ -8,11 +6,13 @@ import {googleSearch} from './inc/scraper.js'
 
 import {isUserSignedIn} from './inc/account.js'
 
+const browser = require('webextension-polyfill')
+
 let count = 0
-if (typeof chrome !== 'undefined') {
+if (typeof browser !== 'undefined') {
   // Ads replacer
   $.get(env.easylist).done(data => {
-    const img = chrome.extension.getURL('images/placeholder.jpg')
+    const img = browser.extension.getURL('images/placeholder.jpg')
     let didScroll = false
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines
@@ -44,54 +44,51 @@ if (typeof chrome !== 'undefined') {
 }
 
 // Send page view
-chrome.runtime.sendMessage(
-  {
-    message: 'allTabs'
-  },
-  response => {
-    if (response && response.tabs) {
-      const current = window.location.href
-      // Check if current URL is a tab
-      response.tabs.every(tab => {
-        if (tab.url === current) {
-          const referrer = document.referrer
-          // Post to server
-          sendPageView(tab.url, tab.title, referrer)
-          return false
-        }
+browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
+  if (response && response.tabs) {
+    const current = window.location.href
+    // Check if current URL is a tab
+    response.tabs.every(tab => {
+      if (tab.url === current) {
+        const referrer = document.referrer
+        // Post to server
+        sendPageView(tab.url, tab.title, referrer)
+        return false
+      }
 
-        return true
-      })
-    }
+      return true
+    })
   }
-)
+})
 
 async function sendPageView(url, title, referrer) {
-  return isUserSignedIn().then(response => {
+  try {
+    const isSignedIn = await isUserSignedIn()
     let headers = {}
-    if (response.userStatus) {
+    if (isSignedIn.userStatus) {
       headers = {
-        Authorization: 'Bearer ' + response.token
+        Authorization: 'Bearer ' + isSignedIn.token
       }
     }
 
-    $.ajax({
-      url: env.guppyApiUrl + '/api/histories/',
-      type: 'post',
-      headers,
-      data: {
-        url,
-        title,
-        last_origin: referrer // eslint-disable-line camelcase
-      },
-      dataType: 'json',
-      success: data => {
-        return data
-      }
-    }).fail(() => {
+    try {
+      const ajax = await $.ajax({
+        url: env.guppyApiUrl + '/api/histories/',
+        type: 'post',
+        headers,
+        data: {
+          url,
+          title,
+          last_origin: referrer // eslint-disable-line camelcase
+        },
+        dataType: 'json'
+      })
+
+      return ajax
+    } catch {
       return false
-    })
-  }).catch(() => {
+    }
+  } catch {
     return false
-  })
+  }
 }

@@ -1,13 +1,13 @@
-/* global chrome */
-
 import $ from 'jquery'
 
 import {env} from '../env.js'
 
-export function flipUserStatus(signIn, userInfo) {
-  if (signIn) {
-    return new Promise(resolve => {
-      $.ajax({
+const browser = require('webextension-polyfill')
+
+export async function flipUserStatus(action, userInfo) {
+  if (action === 'login') {
+    try {
+      const response = await $.ajax({
         url: env.guppyApiUrl + '/api/token-auth/',
         type: 'post',
         data: {
@@ -15,127 +15,122 @@ export function flipUserStatus(signIn, userInfo) {
           password: userInfo.pass
         },
         dataType: 'json'
-      }).done(response => {
-        if (response.token) {
-          chrome.storage.local.set({
-            userStatus: signIn,
-            token: response,
-            userInfo: userInfo.email
-          }, () => {
-            if (chrome.runtime.lastError) {
-              resolve('fail')
-            } else {
-              resolve('success')
-            }
-          })
-        } else {
-          resolve('fail')
-        }
-      }).fail(error => {
-        resolve('fail')
-        console.log(error)
       })
-    })
+
+      if (response.token) {
+        await browser.storage.local.set({
+          userStatus: true,
+          token: response,
+          userInfo: userInfo.email
+        })
+
+        if (browser.runtime.lastError) {
+          return 'fail'
+        }
+
+        return 'success'
+      }
+
+      return 'fail'
+    } catch {
+      return 'fail'
+    }
   }
 
-  // Fetch the /logout/ route
-  return new Promise(resolve => {
-    chrome.storage.local.get(['userStatus', 'token', 'userInfo'], response => {
-      if (chrome.runtime.lastError) {
-        resolve('fail')
-      }
+  if (action === 'logout') {
+    const storage = await browser.storage.local.get(['userStatus', 'token', 'userInfo'])
 
-      if (response.userStatus === undefined) {
-        resolve('fail')
-      }
+    if (browser.runtime.lastError || storage.userStatus === undefined) {
+      return 'fail'
+    }
 
-      $.ajax({
+    try {
+      const ajax = await $.ajax({
         url: env.guppyApiUrl + '/api/token-destroy/',
         type: 'post',
         headers: {
-          Authorization: 'Bearer ' + response.token.token
+          Authorization: 'Bearer ' + storage.token.token
         },
         dataType: 'json'
-      }).done(response => {
-        if (!response) {
-          resolve('fail')
-        }
-
-        chrome.storage.local.set({
-          userStatus: false, userInfo: {}
-        }, () => {
-          if (chrome.runtime.lastError) {
-            resolve('fail')
-          }
-
-          resolve('success')
-        })
-      }).fail(error => {
-        chrome.storage.local.set({
-          userStatus: false, userInfo: {}
-        }, () => {
-          if (chrome.runtime.lastError) {
-            resolve('fail')
-          }
-
-          resolve('success')
-        })
-        console.log(error)
       })
-    })
-  })
-}
 
-export function isUserSignedIn() {
-  return new Promise(resolve => {
-    chrome.storage.local.get(['userStatus', 'token', 'userInfo'], response => {
-      if (chrome.runtime.lastError) {
-        resolve(
-          {
-            userStatus: false, userInfo: {}
-          }
-        )
+      if (!ajax) {
+        return 'fail'
       }
 
-      resolve(
-        response.userStatus === undefined ?
-          {
-            userStatus: false, userInfo: {}
-          } :
-          {
-            userStatus: response.userStatus,
-            token: response.token.token,
-            userInfo: response.userInfo
-          }
-      )
-    })
-  })
+      await browser.storage.local.set({
+        userStatus: false, userInfo: {}
+      })
+
+      if (browser.runtime.lastError) {
+        return 'fail'
+      }
+
+      return 'success'
+    } catch {
+      await browser.storage.local.set({
+        userStatus: false, userInfo: {}
+      })
+
+      if (browser.runtime.lastError) {
+        return 'fail'
+      }
+
+      return 'success'
+    }
+  }
 }
 
-export function getAccountInfo() {
-  return new Promise(resolve => {
-    isUserSignedIn().then(response => {
-      if (response.userStatus) {
-        $.ajax({
+export async function isUserSignedIn() {
+  const storage = await browser.storage.local.get(['userStatus', 'token', 'userInfo'])
+
+  if (browser.runtime.lastError) {
+    return (
+      {
+        userStatus: false, userInfo: {}
+      }
+    )
+  }
+
+  if (storage.userStatus === undefined) {
+    return ({
+      userStatus: false, userInfo: {}
+    })
+  }
+
+  return (
+    {
+      userStatus: storage.userStatus,
+      token: storage.token.token,
+      userInfo: storage.userInfo
+    }
+  )
+}
+
+export async function getAccountInfo() {
+  try {
+    const isSignedIn = await isUserSignedIn()
+    if (isSignedIn.userStatus) {
+      try {
+        const ajax = await $.ajax({
           url: env.guppyApiUrl + '/api/account/',
           type: 'get',
           headers: {
-            Authorization: 'Bearer ' + response.token
+            Authorization: 'Bearer ' + isSignedIn.token
           },
-          dataType: 'json',
-          success: data => {
-            resolve(data)
-          }
-        }).fail(() => {
-          // Logout
-          flipUserStatus(false, null)
-          resolve(false)
+          dataType: 'json'
         })
-      } else {
-        resolve(false)
+
+        return ajax
+      } catch {
+        // Logout
+        flipUserStatus('logout', null)
+        return false
       }
-    }).catch(() => {
-      resolve(false)
-    })
-  })
+    } else {
+      return false
+    }
+  } catch {
+    return false
+  }
 }

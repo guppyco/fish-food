@@ -1,5 +1,6 @@
-/* global chrome */
 import $ from 'jquery'
+
+const browser = require('webextension-polyfill')
 
 document.querySelector('form').addEventListener('submit', event => {
   event.preventDefault()
@@ -11,22 +12,19 @@ document.querySelector('form').addEventListener('submit', event => {
 
   if (email && pass) {
     // Send message to background script with email and password
-    chrome.runtime.sendMessage(
-      {
-        message: 'login',
-        payload: {
-          email,
-          pass
-        }
-      },
-      response => {
-        if (response === 'success') {
-          window.location.replace('../html/popup_account.html')
-        } else {
-          $('.error-message').text('This account is not valid')
-        }
+    browser.runtime.sendMessage({
+      message: 'login',
+      payload: {
+        email,
+        pass
       }
-    )
+    }).then(response => {
+      if (response === 'success') {
+        window.location.replace('../html/popup_account.html')
+      } else {
+        $('.error-message').text('This account is not valid')
+      }
+    })
   } else {
     $('#email').attr('placeholder', 'Enter an email.')
     $('#password').attr('placeholder', 'Enter a password.')
