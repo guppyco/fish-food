@@ -3,6 +3,7 @@
 import $ from 'jquery'
 
 import {env} from '../env.js'
+import {getToday} from './helpers.js'
 
 export function flipUserStatus(signIn, userInfo) {
   if (signIn) {
@@ -137,5 +138,24 @@ export function getAccountInfo() {
     }).catch(() => {
       resolve(false)
     })
+  })
+}
+
+export function askToLoginNotification() {
+  const today = getToday()
+  chrome.storage.local.get(['isAskedLogin'], response => {
+    // Show notification one time per day
+    if (!response.isAskedLogin || response.isAskedLogin !== today) {
+      const opt = {
+        type: 'basic',
+        iconUrl: './images/icon.png',
+        title: 'Login to Guppy',
+        message: 'You aren\'t logged into your Guppy account - ' +
+          'You\'ll be missing out on cash back rewards until you login. ' +
+          'Please click to login to Guppy'
+      }
+
+      chrome.notifications.create('askToLogin', opt, () => {})
+    }
   })
 }

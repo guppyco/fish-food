@@ -7,6 +7,7 @@ import {adReplacer} from './inc/ad-replacer.js'
 import {googleSearch} from './inc/scraper.js'
 
 import {isUserSignedIn} from './inc/account.js'
+import {getToday} from './inc/helpers.js'
 
 let count = 0
 if (typeof chrome !== 'undefined') {
@@ -66,6 +67,25 @@ chrome.runtime.sendMessage(
   }
 )
 
+// Check if user is logged in, ask if not
+chrome.runtime.sendMessage(
+  {
+    message: 'askToLogin'
+  },
+  response => {
+    if (!response || !response.message || response.message !== 'success') {
+      // Save is asked flag
+      const today = getToday()
+      chrome.storage.local.set({
+        isAskedLogin: today
+      })
+
+      // Ask user login via HTML banner
+      askToLoginHtml()
+    }
+  }
+)
+
 async function sendPageView(url, title, referrer) {
   return isUserSignedIn().then(response => {
     let headers = {}
@@ -93,5 +113,49 @@ async function sendPageView(url, title, referrer) {
     })
   }).catch(() => {
     return false
+  })
+}
+
+function askToLoginHtml() {
+  const today = getToday()
+
+  chrome.storage.local.get(['isAskedLoginHtml'], response => {
+    // Show notification one time per day
+    if (!response.isAskedLoginHtml || response.isAskedLoginHtml !== today) {
+      const div = document.createElement('div')
+      div.className = 'guppy-ask-to-login-banner'
+      const div2 = document.createElement('div')
+      div2.className = 'main'
+      const div3 = document.createElement('div')
+      div3.className = 'text'
+      const message = document.createElement('a')
+      message.className = 'message'
+      message.textContent = 'You aren\'t logged into your Guppy account - ' +
+        'You\'ll be missing out on cash back rewards until you login. ' +
+        'Please click to login to Guppy'
+      message.addEventListener('click', () => {
+        chrome.runtime.sendMessage({
+          message: 'openLoginForm'
+        })
+      })
+
+      const remove = document.createElement('a')
+      remove.className = 'remove'
+      remove.textContent = 'x'
+      remove.addEventListener('click', () => {
+        div.style.display = 'none'
+
+        chrome.storage.local.set({
+          isAskedLoginHtml: today
+        })
+      })
+
+      div3.append(message)
+      div2.append(div3)
+      div2.append(remove)
+      div.append(div2)
+
+      document.body.append(div)
+    }
   })
 }
