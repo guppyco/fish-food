@@ -1,4 +1,5 @@
 import {
+  askToLoginNotification,
   isUserSignedIn,
   getAccountInfo,
   flipUserStatus
@@ -92,4 +93,46 @@ browser.runtime.onMessage.addListener(request => {
       })
     })
   }
+
+  // Ask user to login
+  if (request.message === 'askToLogin') {
+    return new Promise(resolve => {
+      getAccountInfo().then(account => {
+        if (account) {
+          resolve({
+            message: 'success',
+            data: account
+          })
+        } else {
+          askToLoginNotification()
+          resolve({
+            message: 'fail'
+          })
+        }
+      }).catch(() => {
+        askToLoginNotification()
+        resolve({
+          message: 'error'
+        })
+      })
+    })
+  }
+
+  // Open form to login to the extension
+  if (request.message === 'openLoginForm') {
+    browser.tabs.create({url: './html/popup_sign_in.html'})
+  }
+})
+
+browser.notifications.onClicked.addListener(notifId => {
+  if (notifId === 'askToLogin') {
+    browser.tabs.create({url: './html/popup_sign_in.html'})
+  }
+})
+
+browser.runtime.onStartup.addListener(() => {
+  // Remove flag then ask user to login when starting browser
+  browser.storage.local.set({
+    isAskedLogin: null
+  })
 })

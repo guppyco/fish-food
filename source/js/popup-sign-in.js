@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import {env} from './env.js'
 
 const browser = require('webextension-polyfill')
 
@@ -30,4 +31,9 @@ document.querySelector('form').addEventListener('submit', event => {
     $('#password').attr('placeholder', 'Enter a password.')
     $('#email, #password').css('border-color', 'red')
   }
+})
+
+// Go to signup page when click create account link
+document.querySelector('#signup-link').addEventListener('click', () => {
+  browser.tabs.create({url: env.guppyApiUrl + '/signup/'})
 })

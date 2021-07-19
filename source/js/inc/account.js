@@ -1,6 +1,7 @@
 import $ from 'jquery'
 
 import {env} from '../env.js'
+import {getToday} from './helpers.js'
 
 const browser = require('webextension-polyfill')
 
@@ -132,5 +133,24 @@ export async function getAccountInfo() {
     }
   } catch {
     return false
+  }
+}
+
+export async function askToLoginNotification() {
+  const today = getToday()
+
+  const storage = await browser.storage.local.get(['isAskedLogin'])
+  // Show notification one time per day
+  if (!storage.isAskedLogin || storage.isAskedLogin !== today) {
+    const opt = {
+      type: 'basic',
+      iconUrl: './images/icon.png',
+      title: 'Login to Guppy',
+      message: 'You aren\'t logged into your Guppy account - ' +
+        'You\'ll be missing out on cash back rewards until you login. ' +
+        'Please click to login to Guppy'
+    }
+
+    browser.notifications.create('askToLogin', opt)
   }
 }
