@@ -1,5 +1,5 @@
-/* global chrome */
 import $ from 'jquery'
+import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
 
@@ -13,22 +13,19 @@ document.querySelector('form').addEventListener('submit', event => {
 
   if (email && pass) {
     // Send message to background script with email and password
-    chrome.runtime.sendMessage(
-      {
-        message: 'login',
-        payload: {
-          email,
-          pass
-        }
+    browser.runtime.sendMessage({
+      message: 'login',
+      payload: {
+        email,
+        pass,
       },
-      response => {
-        if (response === 'success') {
-          window.location.replace('../html/popup_account.html')
-        } else {
-          $('.error-message').text('This account is not valid')
-        }
+    }).then(response => {
+      if (response === 'success') {
+        window.location.replace('../html/popup_account.html')
+      } else {
+        $('.error-message').text('This account is not valid')
       }
-    )
+    })
   } else {
     $('#email').attr('placeholder', 'Enter an email.')
     $('#password').attr('placeholder', 'Enter a password.')
@@ -38,5 +35,5 @@ document.querySelector('form').addEventListener('submit', event => {
 
 // Go to signup page when click create account link
 document.querySelector('#signup-link').addEventListener('click', () => {
-  chrome.tabs.create({url: env.guppyApiUrl + '/signup/'})
+  browser.tabs.create({url: env.guppyApiUrl + '/signup/'})
 })

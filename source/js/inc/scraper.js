@@ -3,7 +3,7 @@ import $ from 'jquery'
 import {env} from '../env.js'
 import {isUserSignedIn} from './account.js'
 
-export function googleSearch() {
+export async function googleSearch() {
   // Crawl Google search results
   const origin = window.location.origin
   const isGoogleSearch = origin.includes('://www.google.') || origin.includes('://google.')
@@ -19,25 +19,24 @@ export function googleSearch() {
     const terms = $('input[name="q"]').val()
 
     let headers = {}
-    isUserSignedIn().then(response => {
-      if (response.userStatus) {
-        headers = {
-          Authorization: 'Bearer ' + response.token
-        }
+    const isSignedIn = await isUserSignedIn()
+    if (isSignedIn.userStatus) {
+      headers = {
+        Authorization: 'Bearer ' + isSignedIn.token,
       }
+    }
 
-      $.ajax({
-        url: env.guppyApiUrl + '/api/search/',
-        type: 'post',
-        traditional: true, // Remove brackets
-        headers,
-        data: {
-          search_type: 0, // eslint-disable-line camelcase
-          search_terms: terms, // eslint-disable-line camelcase
-          search_results: items // eslint-disable-line camelcase
-        },
-        dataType: 'json'
-      })
+    $.ajax({
+      url: env.guppyApiUrl + '/api/search/',
+      type: 'post',
+      traditional: true, // Remove brackets
+      headers,
+      data: {
+        search_type: 0, // eslint-disable-line camelcase
+        search_terms: terms, // eslint-disable-line camelcase
+        search_results: items, // eslint-disable-line camelcase
+      },
+      dataType: 'json',
     })
   }
 }
