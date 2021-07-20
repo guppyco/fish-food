@@ -1,147 +1,138 @@
-/* global chrome */
+import browser from 'webextension-polyfill'
 
 import {
   askToLoginNotification,
   isUserSignedIn,
   getAccountInfo,
-  flipUserStatus
+  flipUserStatus,
 } from './inc/account.js'
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
-    flipUserStatus(true, request.payload)
-      .then(response => {
-        sendResponse(response)
-      })
-      .catch(error => {
-        sendResponse({
+    return new Promise(resolve => {
+      flipUserStatus('login', request.payload).then(response => {
+        resolve(response)
+      }).catch(error => {
+        resolve({
           message: 'error',
-          err: error
+          err: error,
         })
       })
-
-    return true
+    })
   }
 
   if (request.message === 'logout') {
-    flipUserStatus(false, null)
-      .then(response => {
-        sendResponse({
+    return new Promise(resolve => {
+      flipUserStatus('logout', null).then(response => {
+        resolve({
           message: 'success',
-          data: response
+          data: response,
         })
-      })
-      .catch(error => {
-        sendResponse({
+      }).catch(error => {
+        resolve({
           message: 'error',
-          err: error
+          err: error,
         })
       })
-
-    return true
+    })
   }
 
   if (request.message === 'userStatus') {
-    isUserSignedIn()
-      .then(response => {
+    return new Promise(resolve => {
+      isUserSignedIn().then(response => {
         if (response.userStatus) {
-          sendResponse({
+          resolve({
             message: 'success',
-            userInfo: response.userInfo
+            userInfo: response.userInfo,
           })
         } else {
-          sendResponse({
-            message: 'fail'
+          resolve({
+            message: 'fail',
           })
         }
-      })
-      .catch(error => {
-        sendResponse({
+      }).catch(error => {
+        resolve({
           message: 'error',
-          err: error
+          err: error,
         })
       })
-    return true
+    })
   }
 
   if (request.message === 'userAccount') {
-    getAccountInfo()
-      .then(account => {
+    return new Promise(resolve => {
+      getAccountInfo().then(account => {
         if (account) {
-          sendResponse({
+          resolve({
             message: 'success',
-            data: account
+            data: account,
           })
         } else {
-          sendResponse({
-            message: 'fail'
+          resolve({
+            message: 'fail',
           })
         }
-      })
-      .catch(() => {
-        sendResponse({
-          message: 'error'
+      }).catch(() => {
+        resolve({
+          message: 'error',
         })
       })
-
-    return true
+    })
   }
 
   // Get all tabs
   if (request.message === 'allTabs') {
     const queryOptions = {}
-    chrome.tabs.query(queryOptions, tabs => {
-      // Fix Tabs cannot be edited right now (user may be dragging a tab).
-      // https://www.reddit.com/r/chrome_extensions/comments/no7igm/
-      setTimeout(() => {
-        sendResponse({tabs})
-      }, 500)
+    return new Promise(resolve => {
+      browser.tabs.query(queryOptions).then(tabs => {
+        // Fix Tabs cannot be edited right now (user may be dragging a tab).
+        // https://www.reddit.com/r/chrome_extensions/comments/no7igm/
+        setTimeout(() => {
+          resolve({tabs})
+        }, 500)
+      })
     })
-
-    return true
   }
 
   // Ask user to login
   if (request.message === 'askToLogin') {
-    getAccountInfo()
-      .then(account => {
+    return new Promise(resolve => {
+      getAccountInfo().then(account => {
         if (account) {
-          sendResponse({
+          resolve({
             message: 'success',
-            data: account
+            data: account,
           })
         } else {
           askToLoginNotification()
-          sendResponse({
-            message: 'fail'
+          resolve({
+            message: 'fail',
           })
         }
-      })
-      .catch(() => {
+      }).catch(() => {
         askToLoginNotification()
-        sendResponse({
-          message: 'error'
+        resolve({
+          message: 'error',
         })
       })
-
-    return true
+    })
   }
 
   // Open form to login to the extension
   if (request.message === 'openLoginForm') {
-    chrome.tabs.create({url: './html/popup_sign_in.html'})
+    browser.tabs.create({url: './html/popup_sign_in.html'})
   }
 })
 
-chrome.notifications.onClicked.addListener(notifId => {
+browser.notifications.onClicked.addListener(notifId => {
   if (notifId === 'askToLogin') {
-    chrome.tabs.create({url: './html/popup_sign_in.html'})
+    browser.tabs.create({url: './html/popup_sign_in.html'})
   }
 })
 
-chrome.runtime.onStartup.addListener(() => {
+browser.runtime.onStartup.addListener(() => {
   // Remove flag then ask user to login when starting browser
-  chrome.storage.local.set({
-    isAskedLogin: null
+  browser.storage.local.set({
+    isAskedLogin: null,
   })
 })

@@ -1,6 +1,5 @@
-/* global chrome */
-
 import $ from 'jquery'
+import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
@@ -10,20 +9,17 @@ import {isUserSignedIn} from './inc/account.js'
 import {getToday} from './inc/helpers.js'
 
 let count = 0
-if (typeof chrome !== 'undefined') {
+if (typeof browser !== 'undefined') {
   // Ads replacer
   $.get(env.easylist).done(data => {
-    const img = chrome.extension.getURL('images/placeholder.jpg')
+    const img = browser.extension.getURL('images/placeholder.jpg')
     let didScroll = false
     const easylistLines = data.split('\n')
-    const easylistSelectors = easylistLines
-      .filter(line => {
-        return line.startsWith('##')
-      })
-      .map(line => {
-        return line.replace(/^##/, '')
-      })
-      .join(',')
+    const easylistSelectors = easylistLines.filter(line => (
+      line.startsWith('##')
+    )).map(line => (
+      line.replace(/^##/, '')
+    )).join(',')
 
     count = adReplacer(easylistSelectors, img, count)
     $(document).ready(() => {
@@ -40,122 +36,113 @@ if (typeof chrome !== 'undefined') {
         count = adReplacer(easylistSelectors, img, count)
         didScroll = false
       }
-    }, 10000)
+    }, 10_000)
   })
 }
 
 // Send page view
-chrome.runtime.sendMessage(
-  {
-    message: 'allTabs'
-  },
-  response => {
-    if (response && response.tabs) {
-      const current = window.location.href
-      // Check if current URL is a tab
-      response.tabs.every(tab => {
-        if (tab.url === current) {
-          const referrer = document.referrer
-          // Post to server
-          sendPageView(tab.url, tab.title, referrer)
-          return false
-        }
+browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
+  if (response && response.tabs) {
+    const current = window.location.href
+    // Check if current URL is a tab
+    response.tabs.every(tab => {
+      if (tab.url === current) {
+        const referrer = document.referrer
+        // Post to server
+        sendPageView(tab.url, tab.title, referrer)
+        return false
+      }
 
-        return true
-      })
-    }
+      return true
+    })
   }
-)
+})
 
 // Check if user is logged in, ask if not
-chrome.runtime.sendMessage(
-  {
-    message: 'askToLogin'
-  },
-  response => {
-    if (!response || !response.message || response.message !== 'success') {
-      // Save is asked flag
-      const today = getToday()
-      chrome.storage.local.set({
-        isAskedLogin: today
-      })
+browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
+  if (!response || !response.message || response.message !== 'success') {
+    // Save is asked flag
+    const today = getToday()
+    browser.storage.local.set({
+      isAskedLogin: today,
+    })
 
-      // Ask user login via HTML banner
-      askToLoginHtml()
-    }
+    // Ask user login via HTML banner
+    askToLoginHtml()
   }
-)
+})
 
 async function sendPageView(url, title, referrer) {
-  return isUserSignedIn().then(response => {
+  try {
+    const isSignedIn = await isUserSignedIn()
     let headers = {}
-    if (response.userStatus) {
+    if (isSignedIn.userStatus) {
       headers = {
-        Authorization: 'Bearer ' + response.token
+        Authorization: 'Bearer ' + isSignedIn.token,
       }
     }
 
-    $.ajax({
-      url: env.guppyApiUrl + '/api/histories/',
-      type: 'post',
-      headers,
-      data: {
-        url,
-        title,
-        last_origin: referrer // eslint-disable-line camelcase
-      },
-      dataType: 'json',
-      success: data => {
-        return data
-      }
-    }).fail(() => {
+    try {
+      const ajax = await $.ajax({
+        url: env.guppyApiUrl + '/api/histories/',
+        type: 'post',
+        headers,
+        data: {
+          url,
+          title,
+          last_origin: referrer, // eslint-disable-line camelcase
+        },
+        dataType: 'json',
+      })
+
+      return ajax
+    } catch {
       return false
-    })
-  }).catch(() => {
+    }
+  } catch {
     return false
-  })
+  }
 }
 
-function askToLoginHtml() {
+async function askToLoginHtml() {
   const today = getToday()
 
-  chrome.storage.local.get(['isAskedLoginHtml'], response => {
-    // Show notification one time per day
-    if (!response.isAskedLoginHtml || response.isAskedLoginHtml !== today) {
-      const div = document.createElement('div')
-      div.className = 'guppy-ask-to-login-banner'
-      const div2 = document.createElement('div')
-      div2.className = 'main'
-      const div3 = document.createElement('div')
-      div3.className = 'text'
-      const message = document.createElement('a')
-      message.className = 'message'
-      message.textContent = 'You aren\'t logged into your Guppy account - ' +
-        'You\'ll be missing out on cash back rewards until you login. ' +
-        'Please click to login to Guppy'
-      message.addEventListener('click', () => {
-        chrome.runtime.sendMessage({
-          message: 'openLoginForm'
-        })
+  const storage = await browser.storage.local.get(['isAskedLoginHtml'])
+  // Show notification one time per day
+  if (!storage.isAskedLoginHtml || storage.isAskedLoginHtml !== today) {
+    const div = document.createElement('div')
+    div.className = 'guppy-ask-to-login-banner'
+    const div2 = document.createElement('div')
+    div2.className = 'main'
+    const div3 = document.createElement('div')
+    div3.className = 'text'
+    const message = document.createElement('a')
+    message.className = 'message'
+    message.textContent = 'You aren\'t logged into your Guppy account - '
+      + 'You\'ll be missing out on cash back rewards until you login. '
+      + 'Please click to login to Guppy'
+    message.addEventListener('click', () => {
+      browser.runtime.sendMessage({
+        message: 'openLoginForm',
       })
+    })
 
-      const remove = document.createElement('a')
-      remove.className = 'remove'
-      remove.textContent = 'x'
-      remove.addEventListener('click', () => {
-        div.style.display = 'none'
+    const remove = document.createElement('a')
+    remove.className = 'remove'
+    remove.textContent = 'x'
+    remove.addEventListener('click', () => {
+      div.style.display = 'none'
 
-        chrome.storage.local.set({
-          isAskedLoginHtml: today
-        })
+      browser.storage.local.set({
+        isAskedLoginHtml: today,
       })
+    })
 
-      div3.append(message)
-      div2.append(div3)
-      div2.append(remove)
-      div.append(div2)
+    div3.append(message)
+    div2.append(div3)
+    div2.append(remove)
+    div.append(div2)
 
-      document.body.append(div)
-    }
-  })
+    document.body.append(div)
+  }
 }

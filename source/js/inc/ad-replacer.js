@@ -5,9 +5,7 @@ export function adReplacer(selectors, img, count) {
     const height = $(this).height()
     const width = $(this).width()
     const className = 'replaced-img-' + count++
-    $(this).replaceWith(
-      '<img class="' + className + '" src="' + img + '" />'
-    )
+    $(this).replaceWith('<img class="' + className + '" src="' + img + '" />')
     $('.' + className)
       .height(height)
       .width(width)
