@@ -1,3 +1,6 @@
+import browser from 'webextension-polyfill'
+import {env} from '../env.js'
+
 export function getToday() {
   const today = new Date()
   const dd = String(today.getDate()).padStart(2, '0')
@@ -5,4 +8,15 @@ export function getToday() {
   const yyyy = today.getFullYear()
 
   return mm + '-' + dd + '-' + yyyy
+}
+
+export async function getCookies(name) {
+  const domain = env.guppyApiUrl
+  const cookie = await browser.cookies.get({url: domain, name})
+
+  if (cookie && cookie.value) {
+    return cookie.value
+  }
+
+  return false
 }
