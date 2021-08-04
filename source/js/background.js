@@ -43,7 +43,7 @@ browser.runtime.onMessage.addListener(request => {
         if (response.userStatus) {
           resolve({
             message: 'success',
-            userInfo: response.userInfo,
+            csrftoken: response.csrftoken,
           })
         } else {
           resolve({
