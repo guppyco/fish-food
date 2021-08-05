@@ -9,7 +9,7 @@ export async function flipUserStatus(action, userInfo) {
     try {
       const response = await $.ajax({
         url: env.guppyApiUrl + '/api/login/',
-        type: 'post',
+        type: 'POST',
         data: {
           username: userInfo.email,
           password: userInfo.pass,
@@ -41,10 +41,7 @@ export async function flipUserStatus(action, userInfo) {
     try {
       const ajax = await $.ajax({
         url: env.guppyApiUrl + '/logout/',
-        type: 'post',
-        headers: {
-          'X-CSRFToken': cookie,
-        },
+        type: 'GET',
         dataType: 'json',
       })
 
@@ -64,7 +61,8 @@ export async function flipUserStatus(action, userInfo) {
 }
 
 export async function isUserSignedIn() {
-  const cookie = await getCookies('csrftoken')
+  const csrftoken = await getCookies('csrftoken')
+  const sessionid = await getCookies('sessionid')
 
   if (browser.runtime.lastError) {
     return (
@@ -74,7 +72,7 @@ export async function isUserSignedIn() {
     )
   }
 
-  if (!cookie) {
+  if (!csrftoken || !sessionid) {
     return ({
       userStatus: false, csrftoken: '',
     })
@@ -83,7 +81,7 @@ export async function isUserSignedIn() {
   return (
     {
       userStatus: true,
-      csrftoken: cookie,
+      csrftoken,
     }
   )
 }
