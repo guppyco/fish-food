@@ -12,10 +12,12 @@ export function getToday() {
 
 export async function getCookies(name) {
   const domain = env.guppyApiUrl
-  const cookie = await browser.cookies.get({url: domain, name})
+  if (typeof browser.cookies !== 'undefined') {
+    const cookie = await browser.cookies.get({url: domain, name})
 
-  if (cookie && cookie.value) {
-    return cookie.value
+    if (cookie && cookie.value) {
+      return cookie.value
+    }
   }
 
   return false
