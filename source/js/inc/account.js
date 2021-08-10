@@ -93,7 +93,7 @@ export async function getAccountInfo() {
       try {
         const ajax = await $.ajax({
           url: env.guppyApiUrl + '/api/account/',
-          type: 'get',
+          type: 'GET',
           dataType: 'json',
         })
 

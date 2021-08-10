@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill'
-import {env} from '../env.js'
 
 export function getToday() {
   const today = new Date()
@@ -11,14 +10,7 @@ export function getToday() {
 }
 
 export async function getCookies(name) {
-  const domain = env.guppyApiUrl
-  if (typeof browser.cookies !== 'undefined') {
-    const cookie = await browser.cookies.get({url: domain, name})
+  const storage = await browser.storage.local.get([name])
 
-    if (cookie && cookie.value) {
-      return cookie.value
-    }
-  }
-
-  return false
+  return storage[name]
 }

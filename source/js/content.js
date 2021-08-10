@@ -3,9 +3,8 @@ import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
-import {googleSearch} from './inc/scraper.js'
+import {googleSearch, sendPageView} from './inc/scraper.js'
 
-import {isUserSignedIn} from './inc/account.js'
 import {getToday} from './inc/helpers.js'
 
 let count = 0
@@ -71,38 +70,6 @@ browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
     askToLoginHtml()
   }
 })
-
-async function sendPageView(url, title, referrer) {
-  try {
-    const isSignedIn = await isUserSignedIn()
-    let headers = {}
-    if (isSignedIn.userStatus) {
-      headers = {
-        Authorization: 'Bearer ' + isSignedIn.token,
-      }
-    }
-
-    try {
-      const ajax = await $.ajax({
-        url: env.guppyApiUrl + '/api/histories/',
-        type: 'post',
-        headers,
-        data: {
-          url,
-          title,
-          last_origin: referrer, // eslint-disable-line camelcase
-        },
-        dataType: 'json',
-      })
-
-      return ajax
-    } catch {
-      return false
-    }
-  } catch {
-    return false
-  }
-}
 
 async function askToLoginHtml() {
   const today = getToday()
