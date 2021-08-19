@@ -1,7 +1,7 @@
 import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
-const button = document.querySelector('button')
+const button = document.querySelector('button#signout')
 
 button.addEventListener('click', () => {
   browser.runtime.sendMessage({message: 'logout'}).then(response => {
@@ -24,6 +24,22 @@ window.addEventListener('load', () => {
       $('#address').text(response.data.profile.address)
       $('#time').text(response.data.profile.last_time)
       $('#status').text(status)
+      let accountType = 'Waitlist'
+      if (response.data.profile.is_waitlisted) {
+        $('.amount-block').addClass('hidden')
+      } else {
+        accountType = 'Approved'
+        $('#paid_amount').text(response.data.profile.paid_amount_text)
+        $('#requesting_amount').text(response.data.profile.requesting_amount_text)
+        $('#unpaid_amount').text(response.data.profile.unpaid_amount_text)
+
+        if (response.data.profile.unpaid_amount >= 1000) {
+          $('.button-enabled').removeClass('hidden')
+          $('.button-disabled').addClass('hidden')
+        }
+      }
+
+      $('#type').text(accountType)
     } else {
       window.location.replace('../html/popup_sign_in.html')
     }

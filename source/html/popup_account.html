@@ -27,13 +27,31 @@
                 <div class="time">
                     <span>Last time posting data: </span><span id="time"></span>
                 </div>
-                <div class="revenue">
-                    <span>Earned value: </span><span id="revenue"></span>
+                <div class="type">
+                    <span>Account type: </span><span id="type"></span>
+                </div>
+                <div class="amount-block">
+                    <div class="paid-amount">
+                        <span>Paid amount: </span><span id="paid_amount"></span>
+                    </div>
+                    <div class="requesting-amount">
+                        <span>Requesting amount: </span><span id="requesting_amount"></span>
+                    </div>
+                    <div class="unpaid-amount">
+                        <span>Unpaid amount: </span><span id="unpaid_amount"></span>
+                    </div>
+                    <div class="payout-button button-enabled hidden">
+                        <button>Request a payout</button>
+                    </div>
+                    <div class="payout-button button-disabled">
+                        <button disabled>Request a payout</button>
+                        <span> (Minimum Guppy payout is $10.)</span>
+                    </div>
                 </div>
             </div>
         </div>
         <div>
-            <button type="submit">Sign Out</button>
+            <button type="submit" id="signout">Sign Out</button>
         </div>
     </div>
 </body>
