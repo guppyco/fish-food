@@ -1,3 +1,4 @@
+import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {
@@ -7,11 +8,15 @@ import {
   flipUserStatus,
 } from './inc/account.js'
 
+import {env} from './env.js'
+
 browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
     return new Promise(resolve => {
       flipUserStatus('login', request.payload).then(response => {
         resolve(response)
+        saveCookie2Storage('csrftoken')
+        saveCookie2Storage('sessionid')
       }).catch(error => {
         resolve({
           message: 'error',
@@ -28,6 +33,8 @@ browser.runtime.onMessage.addListener(request => {
           message: 'success',
           data: response,
         })
+        saveCookie2Storage('csrftoken')
+        saveCookie2Storage('sessionid')
       }).catch(error => {
         resolve({
           message: 'error',
@@ -122,6 +129,35 @@ browser.runtime.onMessage.addListener(request => {
   if (request.message === 'openLoginForm') {
     browser.tabs.create({url: './html/popup_sign_in.html'})
   }
+
+  // Refresh storage from cookies
+  if (request.message === 'refreshStorage') {
+    saveCookie2Storage('csrftoken')
+    saveCookie2Storage('sessionid')
+  }
+
+  // Send history to Guppy
+  // Must to send via background to pass cross-origin
+  if (request.message === 'sendHistory') {
+    $.ajax({
+      url: env.guppyApiUrl + '/api/histories/',
+      type: 'POST',
+      data: request.payload,
+      dataType: 'json',
+    })
+  }
+
+  // Send search to Guppy
+  // Must to send via background to pass cross-origin
+  if (request.message === 'sendSearch') {
+    $.ajax({
+      url: env.guppyApiUrl + '/api/search/',
+      type: 'POST',
+      traditional: true, // Remove brackets of request data
+      data: request.payload,
+      dataType: 'json',
+    })
+  }
 })
 
 browser.notifications.onClicked.addListener(notifId => {
@@ -136,3 +172,25 @@ browser.runtime.onStartup.addListener(() => {
     isAskedLogin: null,
   })
 })
+
+// Get cookies and save to storage
+function saveCookie2Storage(name) {
+  const domain = env.guppyApiUrl
+
+  browser.cookies.get({
+    url: domain,
+    name,
+  }).then(cookie => {
+    const data = {}
+    if (cookie && cookie.value) {
+      data[name] = cookie.value
+    } else {
+      data[name] = false
+    }
+
+    browser.storage.local.set(data)
+  })
+}
+
+saveCookie2Storage('csrftoken')
+saveCookie2Storage('sessionid')

@@ -1,10 +1,8 @@
 import $ from 'jquery'
+import browser from 'webextension-polyfill'
 
-import {env} from '../env.js'
-import {isUserSignedIn} from './account.js'
-
+// Crawl Google search results
 export async function googleSearch() {
-  // Crawl Google search results
   const origin = window.location.origin
   const isGoogleSearch = origin.includes('://www.google.') || origin.includes('://google.')
   if (isGoogleSearch) {
@@ -18,25 +16,29 @@ export async function googleSearch() {
     })
     const terms = $('input[name="q"]').val()
 
-    let headers = {}
-    const isSignedIn = await isUserSignedIn()
-    if (isSignedIn.userStatus) {
-      headers = {
-        Authorization: 'Bearer ' + isSignedIn.token,
-      }
-    }
-
-    $.ajax({
-      url: env.guppyApiUrl + '/api/search/',
-      type: 'post',
-      traditional: true, // Remove brackets
-      headers,
-      data: {
+    browser.runtime.sendMessage({
+      message: 'sendSearch',
+      payload: {
         search_type: 0, // eslint-disable-line camelcase
         search_terms: terms, // eslint-disable-line camelcase
         search_results: items, // eslint-disable-line camelcase
       },
-      dataType: 'json',
     })
   }
+
+  return true
+}
+
+// Send page view
+export async function sendPageView(url, title, referrer) {
+  browser.runtime.sendMessage({
+    message: 'sendHistory',
+    payload: {
+      url,
+      title,
+      last_origin: referrer, // eslint-disable-line camelcase
+    },
+  })
+
+  return true
 }
