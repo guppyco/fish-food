@@ -9,6 +9,7 @@ import {
 } from './inc/account.js'
 
 import {env} from './env.js'
+import {getParameterByName} from './inc/helpers.js'
 
 browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
@@ -194,3 +195,37 @@ function saveCookie2Storage(name) {
 
 saveCookie2Storage('csrftoken')
 saveCookie2Storage('sessionid')
+
+// For request from Google search results, save search term flag to storage,
+// then redirect to site without search term flag
+browser.webRequest.onBeforeRequest.addListener(
+  details => {
+    const searchTerm = getParameterByName('google_search_term', details.url)
+    if (searchTerm) {
+      // Remove search term from URL
+      const baseURL = details.url.replace(
+        '?google_search_term=' + searchTerm, '',
+      ).replace(
+        '&google_search_term=' + searchTerm, '',
+      )
+
+      // Decode search term then save to storage
+      const term = decodeURIComponent(searchTerm.replace(/\+/g, ' '))
+
+      browser.storage.local.get(['searchTerm']).then(storage => {
+        let terms = []
+
+        if (storage.searchTerm && storage.searchTerm.length > 0) {
+          terms = storage.searchTerm
+        }
+
+        terms.push(term)
+        browser.storage.local.set({searchTerm: terms})
+      })
+
+      return {redirectUrl: baseURL}
+    }
+  },
+  {urls: ['<all_urls>']},
+  ['blocking'],
+)

@@ -22,6 +22,8 @@
         "cookies",
         "tabs",
         "notifications",
+        "webRequest",
+        "webRequestBlocking",
         "https://*/*",
         "https://easylist.to/",
         "http://localhost:8000/",
@@ -33,6 +35,12 @@
             "js": ["js/content.js"],
             "css": ["css/content.css"],
             "run_at": "document_end",
+            "all_frames": true
+        },
+        {
+            "matches": ["http://*/*", "https://*/*"],
+            "js": ["js/content-start.js"],
+            "run_at": "document_start",
             "all_frames": true
         }
     ],
