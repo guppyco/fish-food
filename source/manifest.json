@@ -24,6 +24,7 @@
         "notifications",
         "webRequest",
         "webRequestBlocking",
+        "http://*/*",
         "https://*/*",
         "https://easylist.to/",
         "http://localhost:8000/",

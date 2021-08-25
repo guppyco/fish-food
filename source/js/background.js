@@ -196,7 +196,7 @@ function saveCookie2Storage(name) {
 saveCookie2Storage('csrftoken')
 saveCookie2Storage('sessionid')
 
-// For request from Google search results, save search term flag to storage,
+// For request from Google search results, tracking it as clicked URL,
 // then redirect to site without search term flag
 browser.webRequest.onBeforeRequest.addListener(
   details => {
@@ -212,15 +212,17 @@ browser.webRequest.onBeforeRequest.addListener(
       // Decode search term then save to storage
       const term = decodeURIComponent(searchTerm.replace(/\+/g, ' '))
 
-      browser.storage.local.get(['searchTerm']).then(storage => {
-        let terms = []
-
-        if (storage.searchTerm && storage.searchTerm.length > 0) {
-          terms = storage.searchTerm
-        }
-
-        terms.push(term)
-        browser.storage.local.set({searchTerm: terms})
+      // Send clicked URL
+      $.ajax({
+        url: env.guppyApiUrl + '/api/histories/',
+        type: 'POST',
+        data: {
+          url: baseURL,
+          title: null,
+          last_origin: 'https://www.google.com/', // eslint-disable-line camelcase
+          search_term: term, // eslint-disable-line camelcase
+        },
+        dataType: 'json',
       })
 
       return {redirectUrl: baseURL}
