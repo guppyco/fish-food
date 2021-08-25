@@ -11,7 +11,7 @@ let count = 0
 if (typeof browser !== 'undefined') {
   // Ads replacer
   $.get(env.easylist).done(data => {
-    const img = browser.extension.getURL('images/placeholder.jpg')
+    const img = browser.runtime.getURL('images/placeholder.jpg')
     let didScroll = false
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines.filter(line => (
