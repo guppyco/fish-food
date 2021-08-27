@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
-import {googleSearch, sendPageView} from './inc/scraper.js'
+import {googleSearch} from './inc/scraper.js'
 
 import {getToday} from './inc/helpers.js'
 
@@ -38,24 +38,6 @@ if (typeof browser !== 'undefined') {
     }, 10_000)
   })
 }
-
-// Send page view
-browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
-  if (response && response.tabs) {
-    const current = window.location.href
-    // Check if current URL is a tab
-    response.tabs.every(tab => {
-      if (tab.url === current) {
-        const referrer = document.referrer
-        // Post to server
-        sendPageView(tab.url, tab.title, referrer)
-        return false
-      }
-
-      return true
-    })
-  }
-})
 
 // Check if user is logged in, ask if not
 browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {

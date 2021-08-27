@@ -9,6 +9,7 @@ import {
 } from './inc/account.js'
 
 import {env} from './env.js'
+import {getParameterByName} from './inc/helpers.js'
 
 browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
@@ -194,3 +195,39 @@ function saveCookie2Storage(name) {
 
 saveCookie2Storage('csrftoken')
 saveCookie2Storage('sessionid')
+
+// For request from Google search results, tracking it as clicked URL,
+// then redirect to site without search term flag
+browser.webRequest.onBeforeRequest.addListener(
+  details => {
+    const searchTerm = getParameterByName('google_search_term', details.url)
+    if (searchTerm) {
+      // Remove search term from URL
+      const baseURL = details.url.replace(
+        '?google_search_term=' + searchTerm, '',
+      ).replace(
+        '&google_search_term=' + searchTerm, '',
+      )
+
+      // Decode search term then save to storage
+      const term = decodeURIComponent(searchTerm.replace(/\+/g, ' '))
+
+      // Send clicked URL
+      $.ajax({
+        url: env.guppyApiUrl + '/api/histories/',
+        type: 'POST',
+        data: {
+          url: baseURL,
+          title: null,
+          last_origin: 'https://www.google.com/', // eslint-disable-line camelcase
+          search_term: term, // eslint-disable-line camelcase
+        },
+        dataType: 'json',
+      })
+
+      return {redirectUrl: baseURL}
+    }
+  },
+  {urls: ['<all_urls>']},
+  ['blocking'],
+)
