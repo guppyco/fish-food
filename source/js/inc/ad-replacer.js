@@ -2,17 +2,23 @@ import $ from 'jquery'
 
 export function adReplacer(selectors, count, browser) {
   $(selectors).each(function () {
-    const height = $(this).height()
-    const width = $(this).width()
-    const className = 'replaced-img-' + count++
-    const image = getPlaceholderImage(width, height)
-    const imageName = 'images/placeholder_' + image[0] + 'x' + image[1] + '.jpg'
-    const imageUrl = browser.runtime.getURL(imageName)
-    $(this).replaceWith('<img class="' + className + '" src="' + imageUrl + '" />')
-    $('.' + className)
-      .height(height)
-      .width(width)
-      .css('object-fit', 'cover')
+    // Ignore some cases
+    if (
+      // Youtube video
+      !$(this).hasClass('video-ads')
+    ) {
+      const height = $(this).height()
+      const width = $(this).width()
+      const className = 'replaced-img-' + count++
+      const image = getPlaceholderImage(width, height)
+      const imageName = 'images/placeholder_' + image[0] + 'x' + image[1] + '.jpg'
+      const imageUrl = browser.runtime.getURL(imageName)
+      $(this).replaceWith('<img class="' + className + '" src="' + imageUrl + '" />')
+      $('.' + className)
+        .height(height)
+        .width(width)
+        .css('object-fit', 'cover')
+    }
   })
 
   return count
