@@ -11,7 +11,6 @@ let count = 0
 if (typeof browser !== 'undefined') {
   // Ads replacer
   $.get(env.easylist).done(data => {
-    const img = browser.runtime.getURL('images/placeholder.jpg')
     let didScroll = false
     const easylistLines = data.split('\n')
     const easylistSelectors = easylistLines.filter(line => (
@@ -20,9 +19,9 @@ if (typeof browser !== 'undefined') {
       line.replace(/^##/, '')
     )).join(',')
 
-    count = adReplacer(easylistSelectors, img, count)
+    count = adReplacer(easylistSelectors, count, browser)
     $(document).ready(() => {
-      count = adReplacer(easylistSelectors, img, count)
+      count = adReplacer(easylistSelectors, count, browser)
 
       // Crawl Google search results
       googleSearch()
@@ -32,7 +31,7 @@ if (typeof browser !== 'undefined') {
     })
     setInterval(() => {
       if (didScroll) {
-        count = adReplacer(easylistSelectors, img, count)
+        count = adReplacer(easylistSelectors, count, browser)
         didScroll = false
       }
     }, 10_000)
