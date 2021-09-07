@@ -41,14 +41,29 @@ if (typeof browser !== 'undefined') {
 // Check if user is logged in, ask if not
 browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
   if (!response || !response.message || response.message !== 'success') {
-    // Save is asked flag
+    // Save is asked popup notification flag
     const today = getToday()
     browser.storage.local.set({
       isAskedLogin: today,
     })
 
     // Ask user login via HTML banner
-    askToLoginHtml()
+    browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
+      if (response && response.tabs) {
+        const current = window.location.href
+        // Check if current URL is a tab
+        response.tabs.every(tab => {
+          // Only show the HTML banner for current page
+          // To prevent showing on iframes
+          if (tab.url === current) {
+            askToLoginHtml()
+            return false
+          }
+
+          return true
+        })
+      }
+    })
   }
 })
 
