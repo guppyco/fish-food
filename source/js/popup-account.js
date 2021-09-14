@@ -1,6 +1,8 @@
 import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
+import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/helpers.js'
+
 const button = document.querySelector('button#signout')
 
 button.addEventListener('click', () => {
@@ -44,4 +46,15 @@ window.addEventListener('load', () => {
       window.location.replace('../html/popup_sign_in.html')
     }
   })
+
+  // Update "switch button"
+  isAdsReplacerDisabled().then(checked => {
+    if (checked) {
+      switchButton.checked = true
+    }
+  })
 })
+
+// Disable/Enable ads replacer
+const switchButton = document.querySelector('.switch-button input')
+switchButton.addEventListener('change', toggleAdsReplacer)

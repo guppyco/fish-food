@@ -2,6 +2,7 @@ import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
+import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/helpers.js'
 
 document.querySelector('form').addEventListener('submit', event => {
   event.preventDefault()
@@ -37,3 +38,16 @@ document.querySelector('form').addEventListener('submit', event => {
 document.querySelector('#signup-link').addEventListener('click', () => {
   browser.tabs.create({url: env.guppyApiUrl + '/signup/'})
 })
+
+window.addEventListener('load', () => {
+  // Update "switch button"
+  isAdsReplacerDisabled().then(checked => {
+    if (checked) {
+      switchButton.checked = true
+    }
+  })
+})
+
+// Disable/Enable ads replacer
+const switchButton = document.querySelector('.switch-button input')
+switchButton.addEventListener('change', toggleAdsReplacer)

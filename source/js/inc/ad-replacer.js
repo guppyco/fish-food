@@ -1,6 +1,20 @@
 import $ from 'jquery'
 
-export function adReplacer(selectors, count, browser) {
+import {isAdsReplacerDisabled, getDomainFromUrl} from './helpers.js'
+
+export async function adReplacer(selectors, count, browser) {
+  // Get the URL if it is a "real page"
+  // Or get the refferer if it is loaded via iframe
+  // See: https://stackoverflow.com/a/7739035/4238906
+  const currentUrl = (window.location === window.parent.location)
+    ? document.location.href
+    : document.referrer
+  const currentDomain = await getDomainFromUrl(currentUrl)
+  const isDisabled = await isAdsReplacerDisabled(currentDomain)
+  if (isDisabled) {
+    return count
+  }
+
   $(selectors).each(function () {
     // Ignore some cases
     if (

@@ -93,11 +93,9 @@ browser.runtime.onMessage.addListener(request => {
     const queryOptions = {}
     return new Promise(resolve => {
       browser.tabs.query(queryOptions).then(tabs => {
-        // Fix Tabs cannot be edited right now (user may be dragging a tab).
+        // Risk: Tabs cannot be edited right now (user may be dragging a tab).
         // https://www.reddit.com/r/chrome_extensions/comments/no7igm/
-        setTimeout(() => {
-          resolve({tabs})
-        }, 500)
+        resolve({tabs})
       })
     })
   }
