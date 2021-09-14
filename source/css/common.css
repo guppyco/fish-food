@@ -44,7 +44,7 @@ button:disabled {
     cursor: not-allowed;
 }
 .payout-button button {
-    padding: 3px 10px;
+    padding: 5px 10px;
     font-size: 150%;
 }
 .signup-link {
@@ -66,6 +66,19 @@ button:disabled {
     text-align: left;
     margin: 20px;
     line-height: 20px;
+}
+.message {
+    margin-top: 7px;
+}
+.alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 .hidden {
     display: none;
