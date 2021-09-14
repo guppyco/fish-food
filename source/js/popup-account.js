@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import browser from 'webextension-polyfill'
+import {env} from './env.js'
 
 import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/helpers.js'
 
@@ -14,6 +15,7 @@ button.addEventListener('click', () => {
 })
 
 window.addEventListener('load', () => {
+  // Get account info
   browser.runtime.sendMessage({message: 'userAccount'}).then(response => {
     if (response.message === 'success') {
       let status = 'Inactive'
@@ -45,6 +47,22 @@ window.addEventListener('load', () => {
     } else {
       window.location.replace('../html/popup_sign_in.html')
     }
+  })
+
+  // Request payout
+  $('.request-payout').click(() => {
+    $.ajax({
+      url: env.guppyApiUrl + '/api/payouts/request/',
+      type: 'GET',
+      dataType: 'json',
+    }).done(() => {
+      $('.payout-message').text('Your request is sent')
+      $('.payout-message').addClass('alert-info')
+    }).fail(response => {
+      $('.payout-message').text(response.responseJSON.message)
+      $('.payout-message').addClass('alert-danger')
+    })
+    $('.request-payout').prop('disabled', true)
   })
 
   // Update "switch button"
