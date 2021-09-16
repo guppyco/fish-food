@@ -1,6 +1,9 @@
+/* stylelint-disable property-no-vendor-prefix */
+
 html {
     overflow-x: hidden;
 }
+
 body {
     padding: 10px 5px 20px;
     width: 400px;
@@ -8,18 +11,20 @@ body {
     margin: 0;
     overflow: hidden;
 }
+
 form {
     align-items: center;
     display: flex;
     width: 100%;
     height: 100%;
     justify-content: center;
-    flex-direction: column;
     text-align: center;
     box-sizing: border-box;
-    flex-wrap: wrap;
+    flex-flow: column wrap;
 }
-input[type=email], input[type=password] {
+
+input[type='email'],
+input[type='password'] {
     margin: 10px;
     font-size: 120%;
     width: 80%;
@@ -27,83 +32,102 @@ input[type=email], input[type=password] {
     padding: 10px;
     font-family: monospace;
 }
+
 button {
     font-size: 200%;
     border-radius: 5px;
     border: solid 1px;
     text-align: center;
-    color: black;
+    color: #000;
     font-family: monospace;
     font-weight: bold;
     padding: 10px;
     margin-top: 1%;
     cursor: pointer;
 }
+
 button:disabled {
     color: #bfbfbf;
     cursor: not-allowed;
 }
+
 .payout-button button {
     padding: 5px 10px;
     font-size: 150%;
 }
+
 .signup-link {
     padding: 5px;
     margin-top: 10px;
     text-align: center;
 }
+
 .error-message {
-    color: red;
+    color: #f00;
     padding: 5px 0;
 }
+
 .account {
     text-align: center;
 }
+
 .account .welcome {
     margin: 12px;
 }
+
 .account .profile-info {
     text-align: left;
     margin: 20px;
     line-height: 20px;
 }
+
 .message {
     margin-top: 7px;
 }
+
 .alert-info {
     color: #0c5460;
     background-color: #d1ecf1;
     border-color: #bee5eb;
 }
+
 .alert-danger {
     color: #721c24;
     background-color: #f8d7da;
     border-color: #f5c6cb;
 }
+
 .hidden {
     display: none;
 }
+
 /* The switch - the box around the slider */
 .switch-button-block {
     margin: 20px 10px;
     text-align: center;
 }
+
 .switch {
     position: relative;
     display: inline-block;
     width: 40px;
     height: 22px;
 }
-.switch-label, .switch-button {
+
+.switch-label,
+.switch-button {
     display: inline-block;
     vertical-align: middle;
 }
+
 /* Hide default HTML checkbox */
 .switch input {
-    opacity: 0;
+    opacity: 0%;
     width: 0;
     height: 0;
 }
+
+
 .switch .slider {
     position: absolute;
     cursor: pointer;
@@ -112,34 +136,40 @@ button:disabled {
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
 }
-.switch .slider:before {
+
+.switch .slider::before {
     position: absolute;
-    content: "";
+    content: '';
     height: 14px;
     width: 14px;
     left: 4px;
     bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
+    background-color: #fff;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
 }
+
 .switch input:checked + .slider {
-    background-color: #2196F3;
+    background-color: #2196f3;
 }
+
 .switch input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #2196f3;
 }
-.switch input:checked + .slider:before {
+
+.switch input:checked + .slider::before {
     -webkit-transform: translateX(18px);
     -ms-transform: translateX(18px);
     transform: translateX(18px);
 }
+
 .switch .slider.round {
     border-radius: 22px;
 }
-.switch .slider.round:before {
+
+.switch .slider.round::before {
     border-radius: 50%;
 }
