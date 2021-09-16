@@ -1,6 +1,7 @@
 import $ from 'jquery'
+import browser from 'webextension-polyfill'
 
-import {isAdsReplacerDisabled, getDomainFromUrl} from './helpers.js'
+import {getDomainFromUrl} from './helpers.js'
 
 export async function adReplacer(selectors, count, browser) {
   // Get the URL if it is a "real page"
@@ -94,4 +95,46 @@ function getPlaceholderImage(width, height) {
   }
 
   return matchedImage
+}
+
+// Update storage when toggling the button
+export async function toggleAdsReplacer() {
+  const denyList = await getDenyList()
+  const currentDomain = await getDomainFromUrl()
+  const index = denyList.indexOf(currentDomain)
+
+  if (this.checked && index === -1) {
+    denyList.push(currentDomain)
+  } else if (!this.checked && index > -1) {
+    denyList.splice(index, 1)
+  }
+
+  // Update storage
+  browser.storage.local.set({denyList})
+}
+
+// Check if the current site is disabled
+export async function isAdsReplacerDisabled(domain = null) {
+  if (domain === null) {
+    domain = await getDomainFromUrl()
+  }
+
+  const denyList = await getDenyList()
+
+  if (denyList && denyList.includes(domain)) {
+    return true
+  }
+
+  return false
+}
+
+// Get the list of ads replacer disabled sites
+export async function getDenyList() {
+  let denyList = []
+  const storage = await browser.storage.local.get(['denyList'])
+  if (storage.denyList && Array.isArray(storage.denyList)) {
+    denyList = storage.denyList
+  }
+
+  return denyList
 }
