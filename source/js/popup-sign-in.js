@@ -2,7 +2,7 @@ import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
-import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/helpers.js'
+import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/ad-replacer.js'
 
 document.querySelector('form').addEventListener('submit', event => {
   event.preventDefault()
