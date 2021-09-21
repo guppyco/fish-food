@@ -76,11 +76,11 @@ async function askToLoginHtml() {
     const div = document.createElement('div')
     div.className = 'guppy-ask-to-login-banner'
     const div2 = document.createElement('div')
-    div2.className = 'main'
+    div2.className = 'guppy-main'
     const div3 = document.createElement('div')
-    div3.className = 'text'
+    div3.className = 'guppy-text'
     const message = document.createElement('a')
-    message.className = 'message'
+    message.className = 'guppy-message'
     message.textContent = 'You aren\'t logged into your Guppy account - '
       + 'You\'ll be missing out on cash back rewards until you login. '
       + 'Please click to login to Guppy'
@@ -91,7 +91,7 @@ async function askToLoginHtml() {
     })
 
     const remove = document.createElement('a')
-    remove.className = 'remove'
+    remove.className = 'guppy-remove'
     remove.textContent = 'x'
     remove.addEventListener('click', () => {
       div.style.display = 'none'
