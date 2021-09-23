@@ -1,4 +1,4 @@
 export const env = {
-  guppyApiUrl: 'http://localhost:8000',
+  guppyApiUrl: 'https://guppy.co',
   easylist: 'https://easylist.to/easylist/easylist.txt',
 }
