@@ -9,7 +9,7 @@
     color: #fff;
 }
 
-.guppy-ask-to-login-banner .main {
+.guppy-ask-to-login-banner .guppy-main {
     position: relative;
     padding: 10px;
     min-height: 50px;
@@ -17,18 +17,18 @@
     box-sizing: border-box;
 }
 
-.guppy-ask-to-login-banner .text {
+.guppy-ask-to-login-banner .guppy-text {
     margin-right: 40px;
 }
 
-.guppy-ask-to-login-banner .text .message {
+.guppy-ask-to-login-banner .guppy-text .guppy-message {
     font-size: 15px;
     color: #fff;
     text-decoration: none;
     cursor: pointer;
 }
 
-.guppy-ask-to-login-banner .main .remove {
+.guppy-ask-to-login-banner .guppy-main .guppy-remove {
     position: absolute;
     right: 0;
     top: 0;
