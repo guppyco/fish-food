@@ -32,6 +32,7 @@ window.addEventListener('load', () => {
       if (response.data.profile.is_waitlisted) {
         $('.amount-block').addClass('hidden')
       } else {
+        $('.amount-block').removeClass('hidden')
         accountType = 'Approved'
         $('#paid_amount').text(response.data.profile.paid_amount_text)
         $('#requesting_amount').text(response.data.profile.requesting_amount_text)
