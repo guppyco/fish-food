@@ -1,5 +1,6 @@
 node_modules
 yarn.lock
 distribution
+distribution_firefox
 .parcel-cache
 source/js/env.js

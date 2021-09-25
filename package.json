@@ -2,6 +2,8 @@
     "private": true,
     "scripts": {
         "build": "parcel build source/manifest.json --no-content-hash --no-source-maps --dist-dir distribution --no-cache --detailed-report 0",
+        "build-firefox": "parcel build source/manifest.json --no-content-hash --no-source-maps --dist-dir distribution_firefox --no-cache --detailed-report 0 && npm run copy-minifest-firefox",
+        "copy-minifest-firefox": "cp source/manifest-firefox.json distribution_firefox/manifest.json",
         "lint": "run-p lint:*",
         "lint-fix": "run-p 'lint:* -- --fix'",
         "lint:css": "stylelint source/**/*.css",
