@@ -13,6 +13,15 @@
 
 ![Sample extension output](media/previewer.png)
 
+## Installation
+
+- Install yarn
+- Create `source/js/env.js` base on `source/js/env.example.js`
+- Install dependencies: `yarn`
+- Build: `yarn build`
+- Watch: `yarn watch`
+- Test: `yarn test`
+
 ## Features
 
 - Use npm dependencies thanks to Parcel 2.
