@@ -42,8 +42,13 @@ document.querySelector('#signup-link').addEventListener('click', () => {
 window.addEventListener('load', () => {
   // Update "switch button"
   isAdsReplacerDisabled().then(checked => {
-    if (checked) {
+    if (checked === false) {
+      switchButton.checked = false
+    } else if (checked === true) {
       switchButton.checked = true
+    } else {
+      // Hide "switch button"
+      document.querySelector('.switch-button-block').style.display = 'none'
     }
   })
 })

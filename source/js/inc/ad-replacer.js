@@ -114,12 +114,17 @@ export async function toggleAdsReplacer() {
 }
 
 // Check if the current site is disabled
+// Return boolean, or the domain if it is not a web page
 export async function isAdsReplacerDisabled(domain = null) {
   if (domain === null) {
     domain = await getDomainFromUrl()
   }
 
   const denyList = await getDenyList()
+
+  if (!domain.includes('.')) {
+    return domain
+  }
 
   if (denyList && denyList.includes(domain)) {
     return true
