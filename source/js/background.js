@@ -126,7 +126,7 @@ browser.runtime.onMessage.addListener(request => {
 
   // Open form to login to the extension
   if (request.message === 'openLoginForm') {
-    browser.tabs.create({url: './html/popup_sign_in.html'})
+    browser.tabs.create({url: env.guppyApiUrl + '/login/'})
   }
 
   // Refresh storage from cookies
@@ -161,7 +161,7 @@ browser.runtime.onMessage.addListener(request => {
 
 browser.notifications.onClicked.addListener(notifId => {
   if (notifId === 'askToLogin') {
-    browser.tabs.create({url: './html/popup_sign_in.html'})
+    browser.tabs.create({url: env.guppyApiUrl + '/login/'})
   }
 })
 
