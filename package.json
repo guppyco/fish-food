@@ -8,9 +8,9 @@
         "lint-fix": "run-p 'lint:* -- --fix'",
         "lint:css": "stylelint source/**/*.css",
         "lint:js": "xo",
-        "lint:web-ext": "web-ext lint",
         "test": "run-p lint:* build",
-        "watch": "parcel watch source/manifest.json --dist-dir distribution --no-cache --no-hmr"
+        "watch": "parcel watch source/manifest.json --dist-dir distribution --no-cache --no-hmr",
+        "web-ext-lint": "web-ext lint"
     },
     "browserslist": [
         "last 1 Chrome version",
