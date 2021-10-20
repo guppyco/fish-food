@@ -2,7 +2,7 @@ import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {env} from '../env.js'
-import {getToday, getCookies} from './helpers.js'
+import {getThisYear, getCookies} from './helpers.js'
 
 export async function flipUserStatus(action, userInfo) {
   if (action === 'login') {
@@ -112,11 +112,11 @@ export async function getAccountInfo() {
 }
 
 export async function askToLoginNotification() {
-  const today = getToday()
+  const thisYear = getThisYear()
 
   const storage = await browser.storage.local.get(['isAskedLogin'])
-  // Show notification one time per day
-  if (!storage.isAskedLogin || storage.isAskedLogin !== today) {
+  // Show notification one time per year
+  if (!storage.isAskedLogin || storage.isAskedLogin !== thisYear) {
     const opt = {
       type: 'basic',
       iconUrl: './images/icon.png',

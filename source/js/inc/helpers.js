@@ -9,6 +9,12 @@ export function getToday() {
   return mm + '-' + dd + '-' + yyyy
 }
 
+export function getThisYear() {
+  const today = new Date()
+
+  return today.getFullYear().toString()
+}
+
 export async function getCookies(name) {
   const storage = await browser.storage.local.get([name])
 

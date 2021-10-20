@@ -5,7 +5,7 @@ import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
 import {googleSearch} from './inc/scraper.js'
 
-import {getToday} from './inc/helpers.js'
+import {getThisYear} from './inc/helpers.js'
 
 let count = 0
 if (typeof browser !== 'undefined') {
@@ -42,9 +42,9 @@ if (typeof browser !== 'undefined') {
 browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
   if (!response || !response.message || response.message !== 'success') {
     // Save is asked popup notification flag
-    const today = getToday()
+    const thisYear = getThisYear()
     browser.storage.local.set({
-      isAskedLogin: today,
+      isAskedLogin: thisYear,
     })
 
     // Ask user login via HTML banner
@@ -68,11 +68,11 @@ browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
 })
 
 async function askToLoginHtml() {
-  const today = getToday()
+  const thisYear = getThisYear()
 
   const storage = await browser.storage.local.get(['isAskedLoginHtml'])
-  // Show notification one time per day
-  if (!storage.isAskedLoginHtml || storage.isAskedLoginHtml !== today) {
+  // Show notification one time per year
+  if (!storage.isAskedLoginHtml || storage.isAskedLoginHtml !== thisYear) {
     const div = document.createElement('div')
     div.className = 'guppy-ask-to-login-banner'
     const div2 = document.createElement('div')
@@ -97,7 +97,7 @@ async function askToLoginHtml() {
       div.style.display = 'none'
 
       browser.storage.local.set({
-        isAskedLoginHtml: today,
+        isAskedLoginHtml: thisYear,
       })
     })
 
