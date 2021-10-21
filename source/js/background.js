@@ -165,13 +165,6 @@ browser.notifications.onClicked.addListener(notifId => {
   }
 })
 
-browser.runtime.onStartup.addListener(() => {
-  // Remove flag then ask user to login when starting browser
-  browser.storage.local.set({
-    isAskedLogin: null,
-  })
-})
-
 // Get cookies and save to storage
 function saveCookie2Storage(name) {
   const domain = env.guppyApiUrl
