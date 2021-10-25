@@ -211,7 +211,7 @@ browser.webRequest.onBeforeRequest.addListener(
           url: baseURL,
           title: null,
           last_origin: 'https://www.google.com/', // eslint-disable-line camelcase
-          search_term: term, // eslint-disable-line camelcase
+          search_term: term.replaceAll('<and>', '&').replaceAll('%3Cand%3E', '&'), // eslint-disable-line camelcase
         },
         dataType: 'json',
       })
