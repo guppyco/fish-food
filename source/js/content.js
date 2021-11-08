@@ -48,6 +48,17 @@ browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
     })
 
     // Ask user login via HTML banner
+    const currentDomain = window.location.hostname
+    const ignoredSites = [
+      'localhost',
+      'staging.guppy.co',
+      'guppy.co',
+    ]
+    // Do not show HTML banner for guppy sites
+    if (ignoredSites.includes(currentDomain)) {
+      return
+    }
+
     browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
       if (response && response.tabs) {
         const current = window.location.href
