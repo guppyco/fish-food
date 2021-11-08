@@ -27,6 +27,7 @@ window.addEventListener('load', () => {
       $('#email').text(response.data.user)
       $('#address').text(response.data.profile.address)
       $('#time').text(response.data.profile.last_time)
+      $('#referral').val(response.data.profile.reflink)
       $('#status').text(status)
       let accountType = 'Waitlist'
       if (response.data.profile.is_waitlisted) {
