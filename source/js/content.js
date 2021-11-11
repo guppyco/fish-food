@@ -36,6 +36,9 @@ if (typeof browser !== 'undefined') {
       }
     }, 10_000)
   })
+
+  // Hide the extension link block
+  hideExtensionLinkBlock()
 }
 
 // Check if user is logged in, ask if not
@@ -49,11 +52,7 @@ browser.runtime.sendMessage({message: 'askToLogin'}).then(response => {
 
     // Ask user login via HTML banner
     const currentDomain = window.location.hostname
-    const ignoredSites = [
-      'localhost',
-      'staging.guppy.co',
-      'guppy.co',
-    ]
+    const ignoredSites = env.guppySites
     // Do not show HTML banner for guppy sites
     if (ignoredSites.includes(currentDomain)) {
       return
@@ -118,5 +117,17 @@ async function askToLoginHtml() {
     div.append(div2)
 
     document.body.append(div)
+  }
+}
+
+// Hide the extension link block for user who installed the extension
+async function hideExtensionLinkBlock() {
+  const currentDomain = window.location.hostname
+
+  if (env.guppySites.includes(currentDomain)) {
+    const block = document.querySelector('#guppy-extension-link')
+    if (block) {
+      block.classList.add('hidden')
+    }
   }
 }
