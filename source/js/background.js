@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {
@@ -9,7 +8,6 @@ import {
 } from './inc/account.js'
 
 import {env} from './env.js'
-import {getParameterByName} from './inc/helpers.js'
 
 browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
@@ -138,23 +136,31 @@ browser.runtime.onMessage.addListener(request => {
   // Send history to Guppy
   // Must to send via background to pass cross-origin
   if (request.message === 'sendHistory') {
-    $.ajax({
-      url: env.guppyApiUrl + '/api/histories/',
-      type: 'POST',
-      data: request.payload,
-      dataType: 'json',
+    fetch(env.guppyApiUrl + '/api/histories/', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      referrerPolicy: 'origin',
+      body: JSON.stringify(request.payload),
     })
   }
 
   // Send search to Guppy
   // Must to send via background to pass cross-origin
   if (request.message === 'sendSearch') {
-    $.ajax({
-      url: env.guppyApiUrl + '/api/search/',
-      type: 'POST',
+    fetch(env.guppyApiUrl + '/api/search/', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
       traditional: true, // Remove brackets of request data
-      data: request.payload,
-      dataType: 'json',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      referrerPolicy: 'origin',
+      body: JSON.stringify(request.payload),
     })
   }
 })
@@ -186,39 +192,3 @@ function saveCookie2Storage(name) {
 
 saveCookie2Storage('csrftoken')
 saveCookie2Storage('sessionid')
-
-// For request from Google search results, tracking it as clicked URL,
-// then redirect to site without search term flag
-browser.webRequest.onBeforeRequest.addListener(
-  details => {
-    const searchTerm = getParameterByName('google_search_term', details.url)
-    if (searchTerm) {
-      // Remove search term from URL
-      const baseURL = details.url.replace(
-        '?google_search_term=' + searchTerm, '',
-      ).replace(
-        '&google_search_term=' + searchTerm, '',
-      )
-
-      // Decode search term then save to storage
-      const term = decodeURIComponent(searchTerm.replace(/\+/g, ' '))
-
-      // Send clicked URL
-      $.ajax({
-        url: env.guppyApiUrl + '/api/histories/',
-        type: 'POST',
-        data: {
-          url: baseURL,
-          title: null,
-          last_origin: 'https://www.google.com/', // eslint-disable-line camelcase
-          search_term: term.replaceAll('<and>', '&').replaceAll('%3Cand%3E', '&'), // eslint-disable-line camelcase
-        },
-        dataType: 'json',
-      })
-
-      return {redirectUrl: baseURL}
-    }
-  },
-  {urls: ['<all_urls>']},
-  ['blocking'],
-)
