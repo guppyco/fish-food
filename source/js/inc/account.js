@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
 import {env} from '../env.js'
@@ -7,17 +6,22 @@ import {getThisYear, getCookies} from './helpers.js'
 export async function flipUserStatus(action, userInfo) {
   if (action === 'login') {
     try {
-      const response = await $.ajax({
-        url: env.guppyApiUrl + '/api/login/',
-        type: 'POST',
-        data: {
+      const response = await fetch(env.guppyApiUrl + '/api/login/', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           username: userInfo.email,
           password: userInfo.pass,
-        },
-        dataType: 'json',
+        }),
       })
 
-      if (response.csrf_token) {
+      const data = await response.json()
+
+      if (data.csrf_token) {
         if (browser.runtime.lastError) {
           return 'fail'
         }
@@ -39,10 +43,13 @@ export async function flipUserStatus(action, userInfo) {
     }
 
     try {
-      const ajax = await $.ajax({
-        url: env.guppyApiUrl + '/logout/',
-        type: 'GET',
-        dataType: 'json',
+      const ajax = await fetch(env.guppyApiUrl + '/logout/', {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-cache',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       if (!ajax || browser.runtime.lastError) {
@@ -91,13 +98,16 @@ export async function getAccountInfo() {
     const isSignedIn = await isUserSignedIn()
     if (isSignedIn.userStatus) {
       try {
-        const ajax = await $.ajax({
-          url: env.guppyApiUrl + '/api/account/',
-          type: 'GET',
-          dataType: 'json',
+        const ajax = await fetch(env.guppyApiUrl + '/api/account/', {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
 
-        return ajax
+        return await ajax.json()
       } catch {
         // Logout
         flipUserStatus('logout', null)

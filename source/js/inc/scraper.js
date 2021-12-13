@@ -1,6 +1,8 @@
 import $ from 'jquery'
 import browser from 'webextension-polyfill'
 
+import {env} from '../env.js'
+
 // Crawl Google search results
 export async function googleSearch() {
   const origin = window.location.origin
@@ -13,9 +15,9 @@ export async function googleSearch() {
       $('#search a').each(function () {
         let uri = $(this).attr('href')
         if (uri) {
-          const separator = uri.includes('?') ? '&' : '?'
           // Temporary replace "&" by "<and>"
-          uri = uri + separator + 'google_search_term=' + terms.replaceAll('&', '<and>')
+          uri = env.guppyApiUrl + '/search-tracking/?url="' + uri + '"&search_term="' + terms.replaceAll('&', '<and>') + '"'
+          // Go to guppy search tracking then redirect to search result page
           $(this).attr('href', uri)
           // Remove event to fix clicking on Firefox
           $(this).prop('onmousedown', null)

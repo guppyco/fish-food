@@ -1,0 +1,96 @@
+{
+  "name": "Guppy",
+  "version": "0.0.1",
+  "description": "Guppy collects any data available to us via our website, browser, and browser extensions.",
+  "homepage_url": "https://guppy.co/",
+  "manifest_version": 3,
+  "minimum_chrome_version": "74",
+  "icons": {
+    "128": "/images/icon.png"
+  },
+  "action": {
+    "default_icon": "/images/icon.png",
+    "default_popup": "/html/popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "/images/icon.png",
+        "/images/placeholder.jpg",
+        "/images/placeholder_120x240.jpg",
+        "/images/placeholder_120x600.jpg",
+        "/images/placeholder_125x125.jpg",
+        "/images/placeholder_160x600.jpg",
+        "/images/placeholder_180x150.jpg",
+        "/images/placeholder_200x200.jpg",
+        "/images/placeholder_234x60.jpg",
+        "/images/placeholder_250x250.jpg",
+        "/images/placeholder_300x1050.jpg",
+        "/images/placeholder_300x250.jpg",
+        "/images/placeholder_300x600.jpg",
+        "/images/placeholder_320x100.jpg",
+        "/images/placeholder_320x50.jpg",
+        "/images/placeholder_336x280.jpg",
+        "/images/placeholder_468x60.jpg",
+        "/images/placeholder_728x90.jpg",
+        "/images/placeholder_970x250.jpg",
+        "/images/placeholder_970x90.jpg",
+        "/js/background.js",
+        "/js/content-start.js",
+        "/js/content.js",
+        "/js/env.example.js",
+        "/js/env.js",
+        "/js/popup-account.js",
+        "/js/popup-sign-in.js",
+        "/js/popup.js",
+        "/html/popup.html",
+        "/html/popup_account.html",
+        "/html/popup_sign_in.html"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "cookies",
+    "tabs",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "/js/content.js"
+      ],
+      "css": [
+        "/css/content.css"
+      ],
+      "run_at": "document_end",
+      "all_frames": true
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "/js/content-start.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "background": {
+    "service_worker": "js/background.js"
+  }
+}

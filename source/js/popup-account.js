@@ -53,17 +53,28 @@ window.addEventListener('load', () => {
 
   // Request payout
   $('.request-payout').click(() => {
-    $.ajax({
-      url: env.guppyApiUrl + '/api/payouts/request/',
-      type: 'GET',
-      dataType: 'json',
-    }).done(() => {
-      $('.payout-message').text('Your request is sent')
-      $('.payout-message').addClass('alert-info')
-    }).fail(response => {
-      $('.payout-message').text(response.responseJSON.message)
+    fetch(env.guppyApiUrl + '/api/payouts/request/', {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(response => {
+      if (response.ok) {
+        $('.payout-message').text('Your request is sent')
+        $('.payout-message').addClass('alert-info')
+      } else {
+        response.json().then(data => {
+          $('.payout-message').text(data.message)
+          $('.payout-message').addClass('alert-danger')
+        })
+      }
+    }).catch(() => {
+      $('.payout-message').text('Something went wrong!')
       $('.payout-message').addClass('alert-danger')
     })
+
     $('.request-payout').prop('disabled', true)
   })
 
