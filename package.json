@@ -10,7 +10,8 @@
         "lint:js": "xo",
         "test": "run-p lint:* build",
         "watch": "parcel watch source/manifest.json --dist-dir distribution --no-cache --no-hmr",
-        "web-ext-lint": "web-ext lint"
+        "web-ext-lint": "web-ext lint",
+        "ci": "yarn install --frozen-lockfile"
     },
     "browserslist": [
         "last 1 Chrome version",
