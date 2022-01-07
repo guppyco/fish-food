@@ -10,5 +10,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: cp source/js/env.example.js source/js/env.js
-      - run: npm install
-      - run: npm test
+      - run: yarn
+      - run: yarn test
