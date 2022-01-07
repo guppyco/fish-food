@@ -50,6 +50,7 @@ if (typeof browser !== 'undefined') {
           addSorvn()
           return false
         }
+
         return true
       })
     }
@@ -149,9 +150,9 @@ async function hideExtensionLinkBlock() {
 
 // Add Sorvn script
 function addSorvn() {
-  let script = document.createElement('script');
-  script.type  = 'text/javascript';
-  script.text  = `
+  const script = document.createElement('script')
+  script.type = 'text/javascript'
+  script.text = `
     var vglnk = {key: 'ffa7d2fcb2bb7c922d9d3f0851bc14fc'};
     (function(d, t) {
         var s = d.createElement(t);
@@ -162,5 +163,5 @@ function addSorvn() {
             r.parentNode.insertBefore(s, r);
     }(document, 'script'));
   `
-  document.body.appendChild(script);
+  document.body.append(script)
 }
