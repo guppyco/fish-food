@@ -48,8 +48,8 @@ jobs:
       - run: cp source/js/env.example.js source/js/env.js
       - name: install
         run: yarn ci || yarn
-      - run: yarn build --if-present
-      - run: yarn build-firefox --if-present
+      - run: yarn build
+      - run: yarn build-firefox
       - name: Update extension’s meta
         run: >-
           npx dot-json@1 $DIRECTORY/manifest.json version ${{
