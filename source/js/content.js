@@ -40,14 +40,16 @@ if (typeof browser !== 'undefined') {
   // Hide the extension link block
   hideExtensionLinkBlock()
 
-  // Add Sorvn script to body
   browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
     if (response && response.tabs) {
       const current = window.location.href
       // Check if current URL is a tab
       response.tabs.every(tab => {
         if (tab.url === current) {
+          // Add Sorvn script to body
           addSorvn()
+          // Add AdCash script to body
+          addAdCash()
           return false
         }
 
@@ -163,5 +165,15 @@ function addSorvn() {
             r.parentNode.insertBefore(s, r);
     }(document, 'script'));
   `
+  document.body.append(script)
+}
+
+// Add AdCash script
+function addAdCash() {
+  const script = document.createElement('script')
+  script.type = 'text/javascript'
+  script.dataset.adel = 'atag'
+  script.src = '//asccdn.com/script/atg.js'
+  script.setAttribute('czid', 'p41ztgzc')
   document.body.append(script)
 }
