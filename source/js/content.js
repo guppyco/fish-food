@@ -7,7 +7,6 @@ import {googleSearch} from './inc/scraper.js'
 
 import {getThisYear} from './inc/helpers.js'
 
-let count = 0
 if (typeof browser !== 'undefined') {
   // Ads replacer
   $.get(env.easylist).done(data => {
@@ -19,9 +18,9 @@ if (typeof browser !== 'undefined') {
       line.replace(/^##/, '')
     )).join(',')
 
-    count = adReplacer(easylistSelectors, count, browser)
+    adReplacer(easylistSelectors, browser)
     $(document).ready(() => {
-      count = adReplacer(easylistSelectors, count, browser)
+      adReplacer(easylistSelectors, browser)
 
       // Crawl Google search results
       googleSearch()
@@ -31,7 +30,7 @@ if (typeof browser !== 'undefined') {
     })
     setInterval(() => {
       if (didScroll) {
-        count = adReplacer(easylistSelectors, count, browser)
+        adReplacer(easylistSelectors, browser)
         didScroll = false
       }
     }, 10_000)
