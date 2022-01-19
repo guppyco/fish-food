@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill'
 import {env} from '../env.js'
 import {getDomainFromUrl} from './helpers.js'
 
-export async function adReplacer(selectors, browser) {
+export async function adReplacer(selectors) {
   // Get the URL if it is a "real page"
   // Or get the refferer if it is loaded via iframe
   // See: https://stackoverflow.com/a/7739035/4238906
@@ -25,24 +25,21 @@ export async function adReplacer(selectors, browser) {
     ) {
       const height = $(this).height()
       const width = $(this).width()
-      const image = getPlaceholderImage(width, height)
-      if (typeof image[2] !== 'undefined' && image[2] === true) {
-        // Replace ads by Guppy's ads
-        const iframeUrl = env.guppyApiUrl + '/advertisers/ads/' + width + '/' + height + '/'
-        const content = `
-          <iframe src="${iframeUrl}" height="${height}" width="${width}"
-          style="object-fit: cover; border: none;" scrolling="no"></iframe>
-        `
-        $(this).replaceWith(content)
-      } else {
-        // Replace ads by placeholder image
-        const imageName = 'images/placeholder_' + image[0] + 'x' + image[1] + '.jpg'
-        const imageUrl = browser.runtime.getURL(imageName)
-        const content = `
-          <img src="${imageUrl}" height="${height}" width="${width}" style="object-fit: cover;"/>
-        `
-        $(this).replaceWith(content)
-      }
+      const adElement = $(this)
+      fetch(`${env.guppyApiUrl}/advertisers/ads-checker/${width}/${height}/`, {})
+        .then(response => {
+          if (response.ok) {
+            // Replace ads by Guppy's ads
+            const iframeUrl = env.guppyApiUrl + '/advertisers/ads/' + width + '/' + height + '/'
+            const content = `
+              <iframe src="${iframeUrl}" height="${height}" width="${width}"
+              style="object-fit: cover; border: none;" scrolling="no"></iframe>
+            `
+            adElement.replaceWith(content)
+          }
+
+          adElement.remove()
+        })
     }
   })
 
@@ -50,6 +47,7 @@ export async function adReplacer(selectors, browser) {
 }
 
 // Get placeholder image with appropriate size
+// eslint-disable-next-line no-unused-vars
 function getPlaceholderImage(width, height) {
   const listImages = [
     // [width, height, has ads]
