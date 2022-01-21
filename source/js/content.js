@@ -5,7 +5,9 @@ import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
 import {googleSearch} from './inc/scraper.js'
 
-import {getThisYear} from './inc/helpers.js'
+import {getThisYear, setupSentry} from './inc/helpers.js'
+
+setupSentry()
 
 if (typeof browser !== 'undefined') {
   // Ads replacer

@@ -42,7 +42,8 @@
         "jquery": "^3.6.0",
         "standard": "^16.0.3",
         "webext-options-sync": "^2.0.1",
-        "webextension-polyfill": "^0.8.0"
+        "webextension-polyfill": "^0.8.0",
+        "@sentry/browser": "^6.16.1"
     },
     "devDependencies": {
         "@parcel/config-webextension": "^2.0.0-rc.0",

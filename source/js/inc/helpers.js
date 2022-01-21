@@ -1,4 +1,23 @@
 import browser from 'webextension-polyfill'
+import * as Sentry from '@sentry/browser'
+
+import {env} from '../env.js'
+
+export function setupSentry() {
+  let environment = null
+  if (env.guppyApiUrl === 'https://guppy.co') {
+    environment = 'ext-production'
+  } else if (env.guppyApiUrl === 'https://staging.guppy.co') {
+    environment = 'ext-staging'
+  }
+
+  if (environment !== null) {
+    Sentry.init({
+      dsn: env.sentryDSN,
+      environment,
+    })
+  }
+}
 
 export function getToday() {
   const today = new Date()
