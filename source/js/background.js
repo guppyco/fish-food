@@ -9,7 +9,9 @@ import {
 } from './inc/account.js'
 
 import {env} from './env.js'
-import {getParameterByName} from './inc/helpers.js'
+import {getParameterByName, setupSentry} from './inc/helpers.js'
+
+setupSentry()
 
 browser.runtime.onMessage.addListener(request => {
   if (request.message === 'login') {
