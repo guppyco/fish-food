@@ -40,22 +40,6 @@ if (typeof browser !== 'undefined') {
 
   // Hide the extension link block
   hideExtensionLinkBlock()
-
-  // Add Sorvn script to body
-  browser.runtime.sendMessage({message: 'allTabs'}).then(response => {
-    if (response && response.tabs) {
-      const current = window.location.href
-      // Check if current URL is a tab
-      response.tabs.every(tab => {
-        if (tab.url === current) {
-          addSorvn()
-          return false
-        }
-
-        return true
-      })
-    }
-  })
 }
 
 // Check if user is logged in, ask if not
@@ -147,22 +131,4 @@ async function hideExtensionLinkBlock() {
       block.classList.add('hidden')
     }
   }
-}
-
-// Add Sorvn script
-function addSorvn() {
-  const script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.text = `
-    var vglnk = {key: 'ffa7d2fcb2bb7c922d9d3f0851bc14fc'};
-    (function(d, t) {
-        var s = d.createElement(t);
-            s.type = 'text/javascript';
-            s.async = true;
-            s.src = '//cdn.viglink.com/api/vglnk.js';
-        var r = d.getElementsByTagName(t)[0];
-            r.parentNode.insertBefore(s, r);
-    }(document, 'script'));
-  `
-  document.body.append(script)
 }
