@@ -15,7 +15,7 @@ export async function googleSearch() {
         if (uri) {
           const separator = uri.includes('?') ? '&' : '?'
           // Temporary replace "&" by "<and>"
-          uri = uri + separator + 'google_search_term=' + terms.replaceAll('&', '<and>')
+          uri = uri + separator + 'google_search_term=' + terms.replace(/&/g, '<and>')
           $(this).attr('href', uri)
           // Remove event to fix clicking on Firefox
           $(this).prop('onmousedown', null)
