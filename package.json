@@ -30,7 +30,10 @@
             ]
         },
         "space": 2,
-        "semicolon": false
+        "semicolon": false,
+        "alias": {
+            "process": false
+        }
     },
     "stylelint": {
         "extends": "stylelint-config-xo",
