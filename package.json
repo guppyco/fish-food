@@ -30,10 +30,7 @@
             ]
         },
         "space": 2,
-        "semicolon": false,
-        "alias": {
-            "process": false
-        }
+        "semicolon": false
     },
     "stylelint": {
         "extends": "stylelint-config-xo",
@@ -60,5 +57,8 @@
     },
     "webExt": {
         "sourceDir": "distribution"
+    },
+    "alias": {
+        "process": false
     }
 }
