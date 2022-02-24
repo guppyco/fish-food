@@ -57,5 +57,8 @@
     },
     "webExt": {
         "sourceDir": "distribution"
+    },
+    "alias": {
+        "process": false
     }
 }
