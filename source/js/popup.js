@@ -1,4 +1,7 @@
+import $ from 'jquery'
 import browser from 'webextension-polyfill'
+
+import {getVersion} from './inc/helpers.js'
 
 window.addEventListener('load', () => {
   // Re-create storage from cookies
@@ -10,5 +13,10 @@ window.addEventListener('load', () => {
         window.location.replace('../html/popup_sign_in.html')
       }
     })
+  })
+
+  // Show the extension version
+  getVersion().then(version => {
+    $('#version').text('v' + version)
   })
 })

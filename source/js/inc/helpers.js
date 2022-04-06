@@ -81,3 +81,10 @@ export async function getCurrentTab() {
 
   return ''
 }
+
+// Get the extension version
+export async function getVersion() {
+  const manifestData = browser.runtime.getManifest()
+
+  return manifestData.version
+}
