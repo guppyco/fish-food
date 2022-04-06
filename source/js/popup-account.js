@@ -3,6 +3,7 @@ import browser from 'webextension-polyfill'
 import {env} from './env.js'
 
 import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/ad-replacer.js'
+import {getVersion} from './inc/helpers.js'
 
 const button = document.querySelector('button#signout')
 
@@ -76,6 +77,11 @@ window.addEventListener('load', () => {
       // Hide "switch button"
       document.querySelector('.switch-button-block').style.display = 'none'
     }
+  })
+
+  // Show the extension version
+  getVersion().then(version => {
+    $('#version').text('v' + version)
   })
 })
 

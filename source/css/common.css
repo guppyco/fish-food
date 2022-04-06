@@ -177,3 +177,11 @@ button:disabled {
 .switch .slider.round::before {
     border-radius: 50%;
 }
+
+.version {
+    margin-top: 10px;
+    margin-right: 15px;
+    float: right;
+    font-size: 11px;
+    color: #7e7e7e;
+}
