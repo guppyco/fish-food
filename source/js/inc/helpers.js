@@ -85,6 +85,18 @@ export async function getCurrentTab() {
 // Get the extension version
 export async function getVersion() {
   const manifestData = browser.runtime.getManifest()
+  let environment = 'production'
+  if (env.guppyApiUrl.includes('localhost')) {
+    environment = 'localhost'
+  }
 
-  return manifestData.version
+  if (env.guppyApiUrl.includes('staging')) {
+    environment = 'staging'
+  }
+
+  return {
+    version: manifestData.version,
+    env: environment,
+    url: env.guppyApiUrl,
+  }
 }

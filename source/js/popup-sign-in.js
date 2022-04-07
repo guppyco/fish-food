@@ -55,7 +55,10 @@ window.addEventListener('load', () => {
 
   // Show the extension version
   getVersion().then(version => {
-    $('#version').text('v' + version)
+    $('#version').text('v' + version.version)
+    if (version.env && version.env !== 'production') {
+      $('#env').text(version.env + ' (' + version.url + ')')
+    }
   })
 })
 
