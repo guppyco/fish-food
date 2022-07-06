@@ -107,7 +107,7 @@ function getPlaceholderImage(width, height) {
   return matchedImage
 }
 
-// Update storage when toggling the button
+// Update storage when toggling the ads replacer button
 export async function toggleAdsReplacer() {
   const denyList = await getDenyList()
   const currentDomain = await getDomainFromUrl()

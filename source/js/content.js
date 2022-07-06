@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill'
 
 import {env} from './env.js'
 import {adReplacer} from './inc/ad-replacer.js'
-import {googleSearch} from './inc/scraper.js'
+import {googleSearch, isMonetizeData} from './inc/scraper.js'
 
 import {getThisYear, setupSentry} from './inc/helpers.js'
 
@@ -25,7 +25,11 @@ if (typeof browser !== 'undefined') {
       adReplacer(easylistSelectors, browser)
 
       // Crawl Google search results
-      googleSearch()
+      isMonetizeData().then(isMonetizeData => {
+        if (isMonetizeData) {
+          googleSearch()
+        }
+      })
     })
     $(window).scroll(() => {
       didScroll = true

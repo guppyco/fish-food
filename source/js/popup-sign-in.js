@@ -4,6 +4,7 @@ import browser from 'webextension-polyfill'
 import {env} from './env.js'
 import {isAdsReplacerDisabled, toggleAdsReplacer} from './inc/ad-replacer.js'
 import {getVersion} from './inc/helpers.js'
+import {isMonetizeData, toggleMonetizeData} from './inc/scraper.js'
 
 document.querySelector('form').addEventListener('submit', event => {
   event.preventDefault()
@@ -41,7 +42,7 @@ document.querySelector('#signup-link').addEventListener('click', () => {
 })
 
 window.addEventListener('load', () => {
-  // Update "switch button"
+  // Update "switch ads button"
   isAdsReplacerDisabled().then(checked => {
     if (checked === false) {
       switchButton.checked = false
@@ -49,8 +50,12 @@ window.addEventListener('load', () => {
       switchButton.checked = true
     } else {
       // Hide "switch button"
-      document.querySelector('.switch-button-block').style.display = 'none'
+      document.querySelector('.switch-ads-block').style.display = 'none'
     }
+  })
+  // Update "switch data button"
+  isMonetizeData().then(checked => {
+    switchDataButton.checked = checked
   })
 
   // Show the extension version
@@ -63,5 +68,9 @@ window.addEventListener('load', () => {
 })
 
 // Disable/Enable ads replacer
-const switchButton = document.querySelector('.switch-button input')
+const switchButton = document.querySelector('.switch-ads input')
 switchButton.addEventListener('change', toggleAdsReplacer)
+
+// Disable/Enable monetizing data
+const switchDataButton = document.querySelector('.switch-data input')
+switchDataButton.addEventListener('change', toggleMonetizeData)
