@@ -49,3 +49,23 @@ export async function sendPageView(url, title, referrer, searchTerm) {
 
   return true
 }
+
+// Update storage when toggling the monetize data button
+export async function toggleMonetizeData() {
+  if (this.checked) {
+    browser.storage.local.set({enabledMonetizeData: true})
+  } else {
+    browser.storage.local.remove(['enabledMonetizeData'])
+  }
+}
+
+// Check if the user enabled monetizing data
+export async function isMonetizeData() {
+  const storage = await browser.storage.local.get(['enabledMonetizeData'])
+
+  if (storage && storage.enabledMonetizeData) {
+    return true
+  }
+
+  return false
+}
