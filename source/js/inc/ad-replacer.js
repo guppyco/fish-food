@@ -23,8 +23,8 @@ export async function adReplacer(selectors) {
       // Youtube video
       !$(this).hasClass('video-ads')
     ) {
-      const height = $(this).height()
-      const width = $(this).width()
+      const height = Math.round($(this).height())
+      const width = Math.round($(this).width())
       const adElement = $(this)
       fetch(`${env.guppyApiUrl}/advertisers/ads-checker/${width}/${height}/`, {})
         .then(response => {
