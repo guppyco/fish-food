@@ -26,20 +26,22 @@ export async function adReplacer(selectors) {
       const height = Math.round($(this).height())
       const width = Math.round($(this).width())
       const adElement = $(this)
-      fetch(`${env.guppyApiUrl}/advertisers/ads-checker/${width}/${height}/`, {})
-        .then(response => {
-          if (response.ok) {
-            // Replace ads by Guppy's ads
-            const iframeUrl = env.guppyApiUrl + '/advertisers/ads/' + width + '/' + height + '/'
-            const content = `
-              <iframe src="${iframeUrl}" height="${height}" width="${width}"
-              style="object-fit: cover; border: none;" scrolling="no"></iframe>
-            `
-            adElement.replaceWith(content)
-          }
+      // Replace ads by Guppy's ads
+      let iframeUrl = env.guppyApiUrl + '/advertisers/ads/' + width + '/' + height + '/'
+      // Show Adsterra ads only for Google pages
+      if (
+        currentDomain.startsWith('www.google.com')
+        || currentDomain.startsWith('google.com')
+      ) {
+        iframeUrl = env.guppyApiUrl + '/advertisers/ads/' + width + '/' + height + '/Adsterra'
+      }
 
-          adElement.remove()
-        })
+      const content = `
+        <iframe src="${iframeUrl}" height="${height}" width="${width}"
+        style="object-fit: cover; border: none;" scrolling="no"></iframe>
+      `
+      adElement.replaceWith(content)
+      adElement.remove()
     }
   })
 
